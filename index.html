@@ -431,7 +431,7 @@
           let detailText = "";
 
           if (dir1 && dir2) {
-            detailText = `🔄 <strong>Wechsel-Match!</strong> Beide sind offen für beide Rollen (Aktiv & Passiv).`;
+            detailText = `🔄 <strong>Wechsel-Match!</strong> Beide sind offen für beide Rollen (Aktiv & Passiv). Partner(in) möchte: <em>${pair.active}</em><br>Du möchtest: <em>${pair.passive}</em>`;
           } else if (dir1) {
             detailText = `Partner(in) möchte: <em>${pair.active}</em><br>Du möchtest: <em>${pair.passive}</em>`;
           } else if (dir2) {
