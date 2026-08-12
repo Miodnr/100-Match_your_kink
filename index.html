@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Kink Match</title>
+  <title>Kink Match - Sharp Edition</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Supabase JS Client & Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,33 +15,22 @@
 
   <style>
     :root {
-      --bg-dim: #0f1117;
-      --bg-surface: #181b24;
-      --bg-elevated: #212534;
-      --bg-input: #12141d;
+      /* B&W Theme */
+      --bg-base: #000000;
+      --bg-panel: #0a0a0a;
+      --border-color: #333333;
+      --border-hover: #ffffff;
+      --text-main: #ffffff;
+      --text-muted: #888888;
       
-      --border-subtle: rgba(255, 255, 255, 0.07);
-      --border-hover: rgba(255, 255, 255, 0.14);
-      
-      --text-main: #f1f3f9;
-      --text-muted: #8e93a6;
-      --text-dim: #606579;
-      
-      --accent-pastel: #a78bfa;
-      --accent-pastel-hover: #9333ea;
-      
-      --color-no: #f87171;
-      --color-no-bg: rgba(248, 113, 113, 0.12);
-      --color-maybe: #fbbf24;
-      --color-maybe-bg: rgba(251, 191, 36, 0.12);
-      --color-yes: #34d399;
-      --color-yes-bg: rgba(52, 211, 153, 0.12);
-      --color-super: #818cf8;
-      --color-super-bg: rgba(129, 140, 248, 0.12);
-      
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 10px;
+      /* Action Colors */
+      --color-no: #f03e3e;
+      --color-maybe: #f59f00;
+      --color-yes: #37b24d;
+      --color-super: #3b5bdb;
+
+      /* UI Sharpness */
+      --radius: 0px; 
     }
 
     * {
@@ -54,8 +43,8 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-dim);
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: var(--bg-base);
       color: var(--text-main);
       display: flex;
       flex-direction: column;
@@ -72,35 +61,28 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 24px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 20px;
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-color);
     }
     .top-nav .brand {
-      font-size: 0.95rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--text-main);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .top-nav .brand-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-pastel);
     }
     .top-nav button {
       width: auto;
       margin: 0;
       padding: 6px 14px;
       font-size: 0.8rem;
-      background: var(--bg-elevated);
-      color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+    }
+    .top-nav button:hover {
+      border-color: var(--text-main);
     }
 
     /* SCREEN ROUTER */
@@ -116,51 +98,54 @@
 
     /* CARDS & CONTAINERS */
     .panel {
-      background: var(--bg-surface);
+      background: var(--bg-panel);
       padding: 28px 24px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
       margin-bottom: 16px;
     }
 
     h2, h3, h4 {
       margin: 0 0 10px 0;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
     p {
       color: var(--text-muted);
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       line-height: 1.5;
-      margin: 0 0 20px 0;
+      margin: 0 0 24px 0;
     }
 
     /* BUTTONS */
     button {
-      background: var(--accent-pastel);
-      color: #0d0f17;
-      border: none;
+      background: var(--text-main);
+      color: var(--bg-base);
+      border: 1px solid var(--text-main);
       padding: 14px 20px;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       font-family: inherit;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       cursor: pointer;
       font-weight: 700;
       width: 100%;
       margin: 6px 0;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
     }
     button:active {
       transform: scale(0.98);
     }
     button.sec {
-      background: var(--bg-elevated);
+      background: var(--bg-base);
       color: var(--text-main);
-      border: 1px solid var(--border-subtle);
+      border: 1px solid var(--border-color);
     }
     button.sec:hover {
-      border-color: var(--border-hover);
+      border-color: var(--text-main);
+      background: #111;
     }
     button.ghost {
       background: transparent;
@@ -168,29 +153,32 @@
       border: 1px solid transparent;
       width: auto;
       padding: 6px 12px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
+    }
+    button.ghost:hover {
+      color: var(--text-main);
     }
 
     input[type="text"] {
       width: 100%;
       padding: 14px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-input);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      background: var(--bg-base);
       color: var(--text-main);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-family: inherit;
       outline: none;
       margin-bottom: 12px;
       transition: border-color 0.2s ease;
     }
     input[type="text"]:focus {
-      border-color: var(--accent-pastel);
+      border-color: var(--text-main);
     }
 
     /* QUIZ SWIPE CARD SYSTEM */
     .quiz-container {
-      height: 380px;
+      height: 420px;
       position: relative;
       margin: 16px 0;
       perspective: 1000px;
@@ -200,92 +188,110 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius);
       padding: 32px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       text-align: center;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
       touch-action: none;
       cursor: grab;
       will-change: transform;
       overflow: hidden;
+      /* Base background is set via JS */
     }
     .swipe-card:active {
       cursor: grabbing;
     }
 
+    /* DYNAMIC COLOR OVERLAY FOR SWIPING */
+    #cardOverlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transition: opacity 0.1s linear, background-color 0.1s linear;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none; /* Let swipes pass through to card */
+    }
+
     .role-badge {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.72rem;
+      padding: 6px 14px;
+      font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      background: rgba(167, 139, 250, 0.12);
-      color: var(--accent-pastel);
-      border: 1px solid rgba(167, 139, 250, 0.2);
+      background: var(--bg-base);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
     }
 
     .card-text {
-      font-size: 1.18rem;
+      font-size: 1.25rem;
       font-weight: 600;
-      line-height: 1.5;
+      line-height: 1.4;
       color: var(--text-main);
       margin: auto 0;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
     .swipe-hint {
       font-size: 0.75rem;
-      color: var(--text-dim);
+      color: rgba(255,255,255,0.6);
       font-weight: 500;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    /* OVERLAY BADGES FOR SWIPE DIRECTION FEEDBACK */
-    .indicator {
+    /* STAMPS FOR SWIPE DIRECTION FEEDBACK */
+    .stamp {
       position: absolute;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      border: 6px solid;
+      padding: 10px 20px;
       opacity: 0;
-      transition: opacity 0.1s linear;
       pointer-events: none;
-      z-index: 10;
+      z-index: 20;
+      white-space: nowrap;
     }
-    .ind-yes {
-      top: 20px; right: 20px;
+    .stamp-yes {
       color: var(--color-yes);
-      border: 2px solid var(--color-yes);
-      background: var(--color-yes-bg);
-      transform: rotate(12deg);
+      border-color: var(--color-yes);
+      transform: translate(-50%, -50%) rotate(-15deg);
     }
-    .ind-no {
-      top: 20px; left: 20px;
+    .stamp-no {
       color: var(--color-no);
-      border: 2px solid var(--color-no);
-      background: var(--color-no-bg);
-      transform: rotate(-12deg);
+      border-color: var(--color-no);
+      transform: translate(-50%, -50%) rotate(15deg);
     }
-    .ind-super {
-      bottom: 60px;
+    .stamp-super {
       color: var(--color-super);
-      border: 2px solid var(--color-super);
-      background: var(--color-super-bg);
+      border-color: var(--color-super);
+      transform: translate(-50%, -50%) rotate(-5deg);
     }
-    .ind-maybe {
-      top: 20px;
+    .stamp-maybe {
       color: var(--color-maybe);
-      border: 2px solid var(--color-maybe);
-      background: var(--color-maybe-bg);
+      border-color: var(--color-maybe);
+      transform: translate(-50%, -50%) rotate(5deg);
     }
 
     /* CONTROLS GRID */
@@ -295,78 +301,77 @@
       gap: 8px;
     }
     .btn-action {
-      padding: 14px 4px;
-      font-size: 0.78rem;
+      padding: 16px 4px;
+      font-size: 0.8rem;
       font-weight: 700;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       margin: 0;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
+      background: var(--bg-base);
+      border: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      color: var(--text-muted);
     }
     .btn-action .sub-text {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 500;
-      opacity: 0.6;
+      opacity: 0.5;
     }
-    .btn-no { color: var(--color-no); border-color: rgba(248, 113, 113, 0.2); }
-    .btn-no:hover { background: var(--color-no-bg); }
-    .btn-maybe { color: var(--color-maybe); border-color: rgba(251, 191, 36, 0.2); }
-    .btn-maybe:hover { background: var(--color-maybe-bg); }
-    .btn-yes { color: var(--color-yes); border-color: rgba(52, 211, 153, 0.2); }
-    .btn-yes:hover { background: var(--color-yes-bg); }
-    .btn-super { color: var(--color-super); border-color: rgba(129, 140, 248, 0.2); }
-    .btn-super:hover { background: var(--color-super-bg); }
+    .btn-no:hover { border-color: var(--color-no); color: var(--color-no); }
+    .btn-maybe:hover { border-color: var(--color-maybe); color: var(--color-maybe); }
+    .btn-yes:hover { border-color: var(--color-yes); color: var(--color-yes); }
+    .btn-super:hover { border-color: var(--color-super); color: var(--color-super); }
 
     /* MATCH CARDS */
     .match-card {
-      background: var(--bg-elevated);
+      background: var(--bg-panel);
       padding: 16px;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       text-align: left;
-      margin-bottom: 10px;
-      border-left: 4px solid var(--color-yes);
-      border: 1px solid var(--border-subtle);
-      border-left-width: 4px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border-color);
+      border-left: 6px solid var(--color-yes);
     }
     .match-card.super { border-left-color: var(--color-super); }
     .match-card.talking { border-left-color: var(--color-maybe); }
-    .match-title { font-weight: 700; font-size: 0.92rem; color: var(--text-main); }
-    .match-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+    .match-title { font-weight: 700; font-size: 0.95rem; color: var(--text-main); text-transform: uppercase; }
+    .match-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; }
 
     /* TOGGLE SWITCH */
     .toggle-wrapper {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: 18px 0;
+      margin: 20px 0;
       text-align: left;
+      padding: 12px 0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
     }
     .switch {
       position: relative;
       display: inline-block;
-      width: 44px;
+      width: 48px;
       height: 24px;
     }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--bg-elevated);
-      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-base);
+      border: 1px solid var(--text-muted);
       transition: .2s ease;
-      border-radius: 24px;
+      border-radius: var(--radius);
     }
     .slider:before {
       position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
       background-color: var(--text-muted);
       transition: .2s ease;
-      border-radius: 50%;
+      border-radius: var(--radius);
     }
-    input:checked + .slider { background-color: var(--accent-pastel); }
-    input:checked + .slider:before { transform: translateX(20px); background-color: #0d0f17; }
+    input:checked + .slider { border-color: var(--text-main); }
+    input:checked + .slider:before { transform: translateX(24px); background-color: var(--text-main); }
 
     /* CUSTOM BUILDER LIST */
     .q-item {
@@ -374,43 +379,15 @@
       align-items: center;
       gap: 12px;
       text-align: left;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.85rem;
-      color: var(--text-main);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
     }
     .q-item input[type="checkbox"] {
-      accent-color: var(--accent-pastel);
+      accent-color: var(--text-main);
       width: 18px;
       height: 18px;
-    }
-
-    .support-box {
-      margin-top: 20px;
-      padding: 16px;
-      background: var(--bg-elevated);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-align: center;
-    }
-    .donation-btn {
-      display: inline-block;
-      background: transparent;
-      color: var(--accent-pastel);
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      font-weight: 700;
-      font-size: 0.82rem;
-      margin-top: 10px;
-      border: 1px solid rgba(167, 139, 250, 0.3);
-      transition: all 0.2s ease;
-    }
-    .donation-btn:hover {
-      background: var(--accent-pastel);
-      color: #0d0f17;
+      border-radius: 0;
     }
   </style>
 </head>
@@ -418,45 +395,37 @@
 
 <!-- NAVIGATION -->
 <div class="top-nav">
-  <div class="brand">
-    <div class="brand-dot"></div>
-    <span>Kink Match</span>
-  </div>
+  <div class="brand">Kink Match</div>
   <button id="btn-nav-home">Menü</button>
 </div>
 
 <!-- SCREEN 1: HAUPTMENÜ -->
 <div id="screen-menu" class="screen active">
   <div class="panel">
-    <h2>Eure Vorlieben & Grenzen</h2>
-    <p>Vergleicht eure Intimitäts-Wünsche anonym und findet gemeinsame Nenner.</p>
+    <h2>Vorlieben Abgleichen</h2>
+    <p>Schwarz auf Weiß: Finde ohne Kompromisse heraus, was ihr beide wollt.</p>
     
     <button id="btn-start-standard">Standard-Quiz starten</button>
     <button class="sec" id="btn-custom-builder">Eigenes Quiz erstellen</button>
 
-    <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
-      <p style="font-size: 0.82rem; font-weight: 600; color: var(--text-main); margin-bottom: 10px;">Raum beitreten:</p>
-      <input type="text" id="roomInput" placeholder="Raum-Code (z.B. KINK-1234)" maxlength="12">
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+      <p style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">Raum beitreten</p>
+      <input type="text" id="roomInput" placeholder="Code eingeben (z.B. KINK-1234)" maxlength="12">
       <button class="sec" id="btn-join-room">Raum öffnen</button>
     </div>
-  </div>
-
-  <div class="support-box">
-    <span>Gefällt euch die App? Unterstützt die Entwicklung & Serverkosten.</span><br>
-    <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">Entwickler unterstützen</a>
   </div>
 </div>
 
 <!-- SCREEN 2: EINSTELLUNGEN -->
 <div id="screen-config" class="screen">
   <div class="panel">
-    <h3>Quiz-Einstellungen</h3>
-    <p>Passe die Auswertung für euer Quiz an.</p>
+    <h3>Einstellungen</h3>
+    <p>Definiere, wie scharf die Auswertung sein soll.</p>
     
     <div class="toggle-wrapper">
       <div>
-        <strong style="font-size: 0.9rem; color: var(--text-main);">Gesprächsstoff anzeigen</strong><br>
-        <span style="font-size: 0.78rem; color: var(--text-muted);">Zeigt Themen, wo einer 'Ja' und einer 'Vielleicht' gewählt hat</span>
+        <strong style="font-size: 0.95rem; text-transform: uppercase;">Gesprächsstoff anzeigen</strong><br>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Ergebnisse bei denen einer 'Ja' und der andere 'Vielleicht' gewählt hat.</span>
       </div>
       <label class="switch">
         <input type="checkbox" id="talkingPointsToggle" checked>
@@ -472,59 +441,65 @@
 <!-- SCREEN 3: CUSTOM QUIZ BUILDER -->
 <div id="screen-custom-builder" class="screen">
   <div class="panel" style="text-align: left; max-height: 75vh; overflow-y: auto;">
-    <h3 style="text-align: center;">Quiz zusammenstellen</h3>
-    <p style="text-align: center;">Wähle Fragen aus dem Pool oder erstelle eigene.</p>
+    <h3 style="text-align: center;">Fragen Pool</h3>
+    <p style="text-align: center;">Wähle die Themen für eure Session aus.</p>
     
     <div id="customQuestionsList">Lade Fragen...</div>
     
-    <div style="margin-top: 20px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-      <h4 style="font-size: 0.88rem;">Eigene Frage hinzufügen</h4>
-      <input type="text" id="customActive" placeholder="Aktiv (z.B. Partner massieren)">
-      <input type="text" id="customPassive" placeholder="Passiv (z.B. Massiert werden)">
-      <button class="sec" id="btn-add-custom">+ Hinzufügen</button>
+    <div style="margin-top: 24px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+      <h4 style="font-size: 0.9rem;">Eigene Frage definieren</h4>
+      <input type="text" id="customActive" placeholder="Aktiv-Rolle (z.B. Partner fesseln)">
+      <input type="text" id="customPassive" placeholder="Passiv-Rolle (z.B. Gefesselt werden)">
+      <button class="sec" id="btn-add-custom">Hinzufügen</button>
     </div>
     
-    <button id="btn-save-custom" style="margin-top: 20px;">Ausgewählte starten</button>
+    <button id="btn-save-custom" style="margin-top: 20px;">Auswahl bestätigen & Starten</button>
   </div>
 </div>
 
 <!-- SCREEN 4: QUIZ INTERFACE -->
 <div id="screen-quiz" class="screen">
   <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
-    <span id="progressText" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">Frage 1 / 10</span>
-    <button class="ghost" id="btn-undo">↩ Rückgängig</button>
+    <span id="progressText" style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">Frage 1 / 10</span>
+    <button class="ghost" id="btn-undo">Rückgängig</button>
   </div>
 
   <div class="quiz-container">
     <div class="swipe-card" id="activeCard">
-      <!-- Indicators for visual drag feedback -->
-      <div class="indicator ind-yes">JA</div>
-      <div class="indicator ind-no">NEIN</div>
-      <div class="indicator ind-super">SUPER JA</div>
-      <div class="indicator ind-maybe">VIELLEICHT</div>
+      <!-- Background Color Overlay for Swipe Feedback -->
+      <div id="cardOverlay"></div>
 
-      <span class="role-badge" id="cardRole">AKTIV</span>
-      <div class="card-text" id="cardQuestionText">Frage lädt...</div>
-      <div class="swipe-hint">Wischen oder Buttons tippen</div>
+      <!-- Center Stamps -->
+      <div class="stamp stamp-yes" id="stamp-yes">JA</div>
+      <div class="stamp stamp-no" id="stamp-no">NEIN</div>
+      <div class="stamp stamp-super" id="stamp-super">SUPER JA</div>
+      <div class="stamp stamp-maybe" id="stamp-maybe">VIELLEICHT</div>
+
+      <!-- Card Content -->
+      <div class="card-content">
+        <span class="role-badge" id="cardRole">AKTIV</span>
+        <div class="card-text" id="cardQuestionText">Frage lädt...</div>
+        <div class="swipe-hint">Karten wischen oder Buttons nutzen</div>
+      </div>
     </div>
   </div>
 
   <div class="controls-grid">
     <button class="btn-action btn-no" onclick="handleAnswer(0)">
       <span>Nein</span>
-      <span class="sub-text">◄ Wischen</span>
+      <span class="sub-text">◄ LINKS</span>
     </button>
     <button class="btn-action btn-maybe" onclick="handleAnswer(1)">
       <span>Vielleicht</span>
-      <span class="sub-text">▼ Wischen</span>
+      <span class="sub-text">▼ UNTEN</span>
     </button>
     <button class="btn-action btn-yes" onclick="handleAnswer(2)">
       <span>Ja</span>
-      <span class="sub-text">Wischen ►</span>
+      <span class="sub-text">RECHTS ►</span>
     </button>
     <button class="btn-action btn-super" onclick="handleAnswer(3)">
       <span>Super Ja</span>
-      <span class="sub-text">▲ Wischen</span>
+      <span class="sub-text">▲ OBEN</span>
     </button>
   </div>
 </div>
@@ -532,22 +507,25 @@
 <!-- SCREEN 5: ERGEBNISSE -->
 <div id="screen-results" class="screen">
   <div class="panel" style="max-height: 82vh; overflow-y: auto;">
-    <h2>Ergebnisse</h2>
-    <div id="roomCodeDisplay" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-pastel); margin-bottom: 16px;"></div>
+    <h2>Auswertung</h2>
+    <div style="border: 1px dashed var(--border-color); padding: 12px; text-align: center; margin-bottom: 20px;">
+      <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);">Aktiver Raum</div>
+      <div id="roomCodeDisplay" style="font-size: 1.2rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text-main);"></div>
+    </div>
     
     <button id="shareBtn" onclick="shareRoomLink()">Einladungs-Link teilen</button>
 
-    <div id="matchesOutput" style="margin-top: 20px;"></div>
+    <div id="matchesOutput" style="margin-top: 24px;"></div>
 
     <!-- KINK PROFIL (PIE CHART) -->
-    <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
-      <h3 style="font-size: 1rem;">Euer Kink-Profil</h3>
-      <div id="chartContainer" style="position: relative; width: 100%; height: 220px; margin-top: 12px;">
+    <div style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+      <h3 style="font-size: 1rem;">Kink Profil (Beta)</h3>
+      <div id="chartContainer" style="position: relative; width: 100%; height: 220px; margin-top: 16px;">
         <canvas id="kinkChart"></canvas>
       </div>
     </div>
 
-    <button class="sec" id="btn-results-home" style="margin-top: 20px;">Hauptmenü</button>
+    <button class="sec" id="btn-results-home" style="margin-top: 24px;">Hauptmenü</button>
   </div>
 </div>
 
@@ -573,6 +551,15 @@
   let currentIndex = 0;
   let showTalkingPoints = true;
   let customPairs = [];
+
+  // Muted, non-vibrant background colors for the cards
+  const cardBackColors = [
+    'rgba(70, 85, 95, 0.25)',   // Muted Slate Blue
+    'rgba(95, 70, 80, 0.25)',   // Muted Rose
+    'rgba(75, 95, 80, 0.25)',   // Muted Sage
+    'rgba(90, 85, 105, 0.25)',  // Muted Lavender
+    'rgba(105, 95, 75, 0.25)'   // Muted Sand
+  ];
 
   const defaultQuestions = [
     { id: 1, pair_title: 'Ölmassage', text_active: 'Eine ausgiebige Ganzkörpermassage mit Öl geben', text_passive: 'Eine ausgiebige Ganzkörpermassage mit Öl bekommen', tag: 'sensual' },
@@ -670,7 +657,11 @@
     cardEl.style.transition = 'none';
     cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
     cardEl.style.opacity = '1';
-    hideIndicators();
+    
+    // Assign one of the muted backgrounds to the card
+    cardEl.style.backgroundColor = cardBackColors[currentIndex % cardBackColors.length];
+    
+    resetOverlayAndStamps();
 
     if (currentIndex < questions.length) {
       const q = questions[currentIndex];
@@ -679,7 +670,7 @@
 
       document.getElementById('cardRole').innerText = isPassiv ? "PASSIV" : "AKTIV";
       document.getElementById('cardQuestionText').innerText = text;
-      document.getElementById('progressText').innerText = `Frage ${currentIndex + 1} / ${questions.length}`;
+      document.getElementById('progressText').innerText = `FRAGE ${currentIndex + 1} / ${questions.length}`;
     } else {
       finishQuiz();
     }
@@ -699,7 +690,7 @@
     }
   }
 
-  /* TOUCH & POINTER SWIPE ENGINE */
+  /* SWIPE & STAMP LOGIC */
   let isDragging = false;
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
@@ -723,10 +714,12 @@
       currentX = e.clientX - startX;
       currentY = e.clientY - startY;
 
+      // Move Card
       const rotate = currentX * 0.05;
       card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
 
-      updateSwipeIndicators(currentX, currentY);
+      // Update Color Overlay & Stamps
+      updateFeedbackOverlay(currentX, currentY);
     });
 
     const handlePointerEnd = (e) => {
@@ -734,31 +727,29 @@
       isDragging = false;
       try { card.releasePointerCapture(e.pointerId); } catch(err) {}
 
-      const threshold = 75;
+      const threshold = 80;
       const absX = Math.abs(currentX);
       const absY = Math.abs(currentY);
 
       if (absX > threshold || absY > threshold) {
         if (absX > absY) {
-          // Horizontal Swipe
           if (currentX > threshold) {
-            triggerSwipeOut(500, currentY, 2); // Right = Ja
+            triggerSwipeOut(500, currentY, 2); // Yes
           } else {
-            triggerSwipeOut(-500, currentY, 0); // Left = Nein
+            triggerSwipeOut(-500, currentY, 0); // No
           }
         } else {
-          // Vertical Swipe
           if (currentY < -threshold) {
-            triggerSwipeOut(currentX, -500, 3); // Up = Super Ja
+            triggerSwipeOut(currentX, -500, 3); // Super Yes
           } else {
-            triggerSwipeOut(currentX, 500, 1); // Down = Vielleicht
+            triggerSwipeOut(currentX, 500, 1); // Maybe
           }
         }
       } else {
         // Reset Position smoothly
         card.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
         card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-        hideIndicators();
+        resetOverlayAndStamps();
       }
     };
 
@@ -766,45 +757,74 @@
     card.addEventListener('pointercancel', handlePointerEnd);
   }
 
-  function updateSwipeIndicators(x, y) {
-    const indYes = document.querySelector('.ind-yes');
-    const indNo = document.querySelector('.ind-no');
-    const indSuper = document.querySelector('.ind-super');
-    const indMaybe = document.querySelector('.ind-maybe');
+  function updateFeedbackOverlay(x, y) {
+    const overlay = document.getElementById('cardOverlay');
+    const stampYes = document.getElementById('stamp-yes');
+    const stampNo = document.getElementById('stamp-no');
+    const stampSuper = document.getElementById('stamp-super');
+    const stampMaybe = document.getElementById('stamp-maybe');
 
-    hideIndicators();
+    // Hide all stamps initially for smooth cross-fading
+    stampYes.style.opacity = 0;
+    stampNo.style.opacity = 0;
+    stampSuper.style.opacity = 0;
+    stampMaybe.style.opacity = 0;
 
     const absX = Math.abs(x);
     const absY = Math.abs(y);
+    const maxDist = Math.max(absX, absY);
+    
+    // Max intensity reached at 120px drag
+    let intensity = Math.min(1, maxDist / 120);
 
     if (absX > absY) {
-      if (x > 20) indYes.style.opacity = Math.min(1, (x - 20) / 60);
-      if (x < -20) indNo.style.opacity = Math.min(1, (-x - 20) / 60);
+      if (x > 0) {
+        // Right -> YES (Green)
+        overlay.style.backgroundColor = `rgba(55, 178, 77, 0.6)`;
+        overlay.style.opacity = intensity;
+        stampYes.style.opacity = intensity;
+      } else {
+        // Left -> NO (Red)
+        overlay.style.backgroundColor = `rgba(240, 62, 62, 0.6)`;
+        overlay.style.opacity = intensity;
+        stampNo.style.opacity = intensity;
+      }
     } else {
-      if (y < -20) indSuper.style.opacity = Math.min(1, (-y - 20) / 60);
-      if (y > 20) indMaybe.style.opacity = Math.min(1, (y - 20) / 60);
+      if (y < 0) {
+        // Up -> SUPER YES (Blue)
+        overlay.style.backgroundColor = `rgba(59, 91, 219, 0.6)`;
+        overlay.style.opacity = intensity;
+        stampSuper.style.opacity = intensity;
+      } else {
+        // Down -> MAYBE (Yellow/Orange)
+        overlay.style.backgroundColor = `rgba(245, 159, 0, 0.6)`;
+        overlay.style.opacity = intensity;
+        stampMaybe.style.opacity = intensity;
+      }
     }
   }
 
-  function hideIndicators() {
-    document.querySelectorAll('.indicator').forEach(ind => ind.style.opacity = '0');
+  function resetOverlayAndStamps() {
+    const overlay = document.getElementById('cardOverlay');
+    if (overlay) overlay.style.opacity = 0;
+    
+    document.querySelectorAll('.stamp').forEach(el => el.style.opacity = 0);
   }
 
   function triggerSwipeOut(targetX, targetY, answerVal) {
     const card = document.getElementById('activeCard');
-    card.style.transition = 'transform 0.22s ease-out, opacity 0.22s ease-out';
+    card.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
     card.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${targetX * 0.08}deg)`;
     card.style.opacity = '0';
 
     setTimeout(() => {
-      hideIndicators();
       handleAnswer(answerVal);
-    }, 200);
+    }, 220);
   }
 
   async function finishQuiz() {
     showScreen('screen-results');
-    document.getElementById('roomCodeDisplay').innerText = `RAUM-CODE: ${currentRoomCode}`;
+    document.getElementById('roomCodeDisplay').innerText = currentRoomCode;
 
     if (supabaseClient) {
       try {
@@ -829,11 +849,11 @@
     const container = document.getElementById('matchesOutput');
     
     if (!p2 || p2.length === 0) {
-      container.innerHTML = `<p style="color: var(--text-muted);">Dein Teil ist ausgefüllt. Teile den Code <strong>${currentRoomCode}</strong> mit deinem Partner, um Ergebnisse zu sehen.</p>`;
+      container.innerHTML = `<p style="color: var(--text-muted);">Dein Teil ist abgeschlossen. Sende den Code <strong>${currentRoomCode}</strong> an deinen Partner, um abzugleichen.</p>`;
       return;
     }
 
-    let html = "<h3 style='margin-bottom: 14px;'>Eure Streiflichter</h3>";
+    let html = "<h3 style='margin-bottom: 16px;'>Gemeinsame Nenner</h3>";
     questions.forEach((q, idx) => {
       const a1 = p1[idx] || 0;
       const a2 = p2[idx] || 0;
@@ -842,12 +862,12 @@
         const isSuper = a1 === 3 || a2 === 3;
         html += `<div class="match-card ${isSuper ? 'super' : ''}">
           <div class="match-title">${isSuper ? '★ Super Match' : '✓ Match'}: ${q.pair_title}</div>
-          <div class="match-desc">Beide haben Interesse an dieser Aktion.</div>
+          <div class="match-desc">Beide haben Interesse.</div>
         </div>`;
       } else if (showTalkingPoints && ((a1 >= 2 && a2 === 1) || (a1 === 1 && a2 >= 2))) {
         html += `<div class="match-card talking">
           <div class="match-title">⚏ Gesprächsstoff: ${q.pair_title}</div>
-          <div class="match-desc">Einer sagt Ja, einer Vielleicht – ein gutes Thema zum Abstimmen.</div>
+          <div class="match-desc">Einer sagt Ja, einer Vielleicht.</div>
         </div>`;
       }
     });
@@ -859,10 +879,10 @@
   function shareRoomLink() {
     const url = `${window.location.origin}${window.location.pathname}?ref=${currentRoomCode}`;
     if (navigator.share) {
-      navigator.share({ title: 'Kink Match', text: 'Mach mit beim Kink-Match!', url: url });
+      navigator.share({ title: 'Kink Match', text: 'Vorlieben abgleichen', url: url });
     } else {
       navigator.clipboard.writeText(url);
-      alert('Link in die Zwischenablage kopiert!');
+      alert('Link kopiert!');
     }
   }
 
@@ -880,13 +900,14 @@
     });
 
     new Chart(ctx, {
-      type: 'doughnut',
+      type: 'pie',
       data: {
         labels: ['Sinnlichkeit', 'Fesseln', 'Dominanz', 'Impact', 'Rollenspiele'],
         datasets: [{
           data: scores,
-          backgroundColor: ['#a78bfa', '#34d399', '#818cf8', '#f87171', '#fbbf24'],
-          borderWidth: 0
+          backgroundColor: ['#ffffff', '#aaaaaa', '#777777', '#444444', '#222222'],
+          borderColor: '#000000',
+          borderWidth: 2
         }]
       },
       options: { 
@@ -894,8 +915,8 @@
         maintainAspectRatio: false, 
         plugins: { 
           legend: { 
-            position: 'bottom',
-            labels: { color: '#8e93a6', font: { family: 'Plus Jakarta Sans', size: 11 }, padding: 12 } 
+            position: 'right',
+            labels: { color: '#ffffff', font: { family: 'Space Grotesk', size: 11 }, padding: 12 } 
           } 
         } 
       }
@@ -904,7 +925,7 @@
 
   async function joinRoom() {
     const code = document.getElementById('roomInput').value.trim();
-    if (!code) return alert('Bitte Raum-Code eingeben!');
+    if (!code) return alert('Bitte Code eingeben!');
     currentRoomCode = code;
     userRole = 'p2';
 
