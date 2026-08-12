@@ -3,236 +3,551 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Match your Kinks</title>
+  <title>Kink Match</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Supabase JS Client & Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    * { box-sizing: border-box; user-select: none; -webkit-user-drag: none; }
+    :root {
+      --bg-dim: #0f1117;
+      --bg-surface: #181b24;
+      --bg-elevated: #212534;
+      --bg-input: #12141d;
+      
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.14);
+      
+      --text-main: #f1f3f9;
+      --text-muted: #8e93a6;
+      --text-dim: #606579;
+      
+      --accent-pastel: #a78bfa;
+      --accent-pastel-hover: #9333ea;
+      
+      --color-no: #f87171;
+      --color-no-bg: rgba(248, 113, 113, 0.12);
+      --color-maybe: #fbbf24;
+      --color-maybe-bg: rgba(251, 191, 36, 0.12);
+      --color-yes: #34d399;
+      --color-yes-bg: rgba(52, 211, 153, 0.12);
+      --color-super: #818cf8;
+      --color-super-bg: rgba(129, 140, 248, 0.12);
+      
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      margin: 0; padding: 0;
-      font-family: 'Nunito', sans-serif;
-      background-color: #171210;
-      color: #f3ebd9;
-      display: flex; flex-direction: column; align-items: center;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dim);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       min-height: 100vh;
-      padding-bottom: 30px;
       touch-action: pan-y;
+      overflow-x: hidden;
     }
 
-    /* PERSISTENTE NAVIGATION OBEN */
+    /* TOP BAR */
     .top-nav {
-      width: 100%; max-width: 440px;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 15px 20px; background: #1f1814;
-      border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
     }
-    .top-nav .brand { font-size: 1.1rem; font-weight: 900; color: #ea580c; text-transform: uppercase; }
-    .top-nav button { width: auto; margin: 0; padding: 6px 14px; font-size: 0.85rem; background: #332822; }
-
-    /* SCREEN MANAGEMENT */
-    .screen { display: none !important; width: 90%; max-width: 420px; text-align: center; }
-    .screen.active { display: block !important; }
-
-    .card-box {
-      background: #241c18; padding: 22px; border-radius: 24px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 15px;
+    .top-nav .brand {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--text-main);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .top-nav .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-pastel);
+    }
+    .top-nav button {
+      width: auto;
+      margin: 0;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
     }
 
-    /* BUTTONS & INPUTS */
+    /* SCREEN ROUTER */
+    .screen {
+      display: none !important;
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+    }
+    .screen.active {
+      display: block !important;
+    }
+
+    /* CARDS & CONTAINERS */
+    .panel {
+      background: var(--bg-surface);
+      padding: 28px 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      margin-bottom: 16px;
+    }
+
+    h2, h3, h4 {
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    p {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin: 0 0 20px 0;
+    }
+
+    /* BUTTONS */
     button {
-      background: #ea580c; color: white; border: none; padding: 14px 20px;
-      font-size: 1rem; font-family: 'Nunito', sans-serif; border-radius: 20px;
-      cursor: pointer; font-weight: 800; width: 100%; margin: 8px 0;
-      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.3); transition: transform 0.15s ease;
+      background: var(--accent-pastel);
+      color: #0d0f17;
+      border: none;
+      padding: 14px 20px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-weight: 700;
+      width: 100%;
+      margin: 6px 0;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    button:active { transform: scale(0.97); }
-    button.sec { background: #332822; color: #f3ebd9; box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
-    button.undo { background: #475569; width: auto; padding: 8px 16px; font-size: 0.85rem; }
+    button:active {
+      transform: scale(0.98);
+    }
+    button.sec {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+    button.sec:hover {
+      border-color: var(--border-hover);
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+    }
 
     input[type="text"] {
-      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid #44352c;
-      background: #1a1412; color: #fff; font-size: 0.95rem; text-align: center; margin-bottom: 10px;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s ease;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent-pastel);
     }
 
-    /* QUIZ SWIPE CARD CONTAINER */
-    .quiz-container { 
-      height: 380px; 
-      position: relative; 
-      margin-top: 10px;
+    /* QUIZ SWIPE CARD SYSTEM */
+    .quiz-container {
+      height: 380px;
+      position: relative;
+      margin: 16px 0;
       perspective: 1000px;
     }
+
     .swipe-card {
-      position: absolute; width: 100%; height: 100%; border-radius: 24px;
-      padding: 24px; display: flex; flex-direction: column; justify-content: center;
-      align-items: center; color: white; font-size: 1.25rem; font-weight: 800;
-      background: #2a201b; border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-      touch-action: none; cursor: grab;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      touch-action: none;
+      cursor: grab;
       will-change: transform;
+      overflow: hidden;
     }
-    .swipe-card:active { cursor: grabbing; }
+    .swipe-card:active {
+      cursor: grabbing;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: rgba(167, 139, 250, 0.12);
+      color: var(--accent-pastel);
+      border: 1px solid rgba(167, 139, 250, 0.2);
+    }
+
+    .card-text {
+      font-size: 1.18rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text-main);
+      margin: auto 0;
+    }
 
     .swipe-hint {
-      position: absolute; bottom: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.3);
-      pointer-events: none; text-transform: uppercase; letter-spacing: 1px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 500;
+      letter-spacing: 0.02em;
     }
 
-    .controls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 15px; }
-    .btn-action { padding: 12px 2px; font-size: 0.8rem; border-radius: 14px; margin: 0; }
-    .btn-no { background: #991b1b; }
-    .btn-maybe { background: #d97706; }
-    .btn-yes { background: #15803d; }
-    .btn-super { background: #0284c7; }
+    /* OVERLAY BADGES FOR SWIPE DIRECTION FEEDBACK */
+    .indicator {
+      position: absolute;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.1s linear;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .ind-yes {
+      top: 20px; right: 20px;
+      color: var(--color-yes);
+      border: 2px solid var(--color-yes);
+      background: var(--color-yes-bg);
+      transform: rotate(12deg);
+    }
+    .ind-no {
+      top: 20px; left: 20px;
+      color: var(--color-no);
+      border: 2px solid var(--color-no);
+      background: var(--color-no-bg);
+      transform: rotate(-12deg);
+    }
+    .ind-super {
+      bottom: 60px;
+      color: var(--color-super);
+      border: 2px solid var(--color-super);
+      background: var(--color-super-bg);
+    }
+    .ind-maybe {
+      top: 20px;
+      color: var(--color-maybe);
+      border: 2px solid var(--color-maybe);
+      background: var(--color-maybe-bg);
+    }
 
-    /* RESULTS */
+    /* CONTROLS GRID */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .btn-action {
+      padding: 14px 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      margin: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-action .sub-text {
+      font-size: 0.65rem;
+      font-weight: 500;
+      opacity: 0.6;
+    }
+    .btn-no { color: var(--color-no); border-color: rgba(248, 113, 113, 0.2); }
+    .btn-no:hover { background: var(--color-no-bg); }
+    .btn-maybe { color: var(--color-maybe); border-color: rgba(251, 191, 36, 0.2); }
+    .btn-maybe:hover { background: var(--color-maybe-bg); }
+    .btn-yes { color: var(--color-yes); border-color: rgba(52, 211, 153, 0.2); }
+    .btn-yes:hover { background: var(--color-yes-bg); }
+    .btn-super { color: var(--color-super); border-color: rgba(129, 140, 248, 0.2); }
+    .btn-super:hover { background: var(--color-super-bg); }
+
+    /* MATCH CARDS */
     .match-card {
-      background: #2e241f; padding: 12px; border-radius: 14px; text-align: left;
-      margin-bottom: 8px; border-left: 5px solid #22c55e;
+      background: var(--bg-elevated);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      text-align: left;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--color-yes);
+      border: 1px solid var(--border-subtle);
+      border-left-width: 4px;
     }
-    .match-card.super { border-left-color: #38bdf8; }
-    .match-card.talking { border-left-color: #f59e0b; }
-    .match-title { font-weight: 900; font-size: 0.98rem; }
-    .match-desc { font-size: 0.82rem; color: #bfae9c; margin-top: 3px; }
+    .match-card.super { border-left-color: var(--color-super); }
+    .match-card.talking { border-left-color: var(--color-maybe); }
+    .match-title { font-weight: 700; font-size: 0.92rem; color: var(--text-main); }
+    .match-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-    .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; text-align: left; }
-    .toggle-wrapper input { width: 20px; height: 20px; accent-color: #ea580c; }
-
-    /* SPENDEN / SUPPORT FOOTER */
-    .support-box {
-      margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.03);
-      border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.82rem; color: #bfae9c; text-align: center;
+    /* TOGGLE SWITCH */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 0;
+      text-align: left;
     }
-    .donation-btn {
-      display: inline-block; background: #2a201b; color: #f3ebd9; text-decoration: none;
-      padding: 8px 16px; border-radius: 16px; font-weight: 800; font-size: 0.85rem;
-      margin-top: 8px; border: 1px solid rgba(234, 88, 12, 0.5); transition: all 0.2s ease;
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
     }
-    .donation-btn:hover { background: #ea580c; color: #fff; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      transition: .2s ease;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background-color: var(--text-muted);
+      transition: .2s ease;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent-pastel); }
+    input:checked + .slider:before { transform: translateX(20px); background-color: #0d0f17; }
 
     /* CUSTOM BUILDER LIST */
-    .q-item { display: flex; align-items: center; gap: 10px; text-align: left; padding: 6px 0; border-bottom: 1px solid #332822; font-size: 0.85rem; }
-    .q-item input { width: 18px; height: 18px; accent-color: #ea580c; }
+    .q-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+    .q-item input[type="checkbox"] {
+      accent-color: var(--accent-pastel);
+      width: 18px;
+      height: 18px;
+    }
+
+    .support-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .donation-btn {
+      display: inline-block;
+      background: transparent;
+      color: var(--accent-pastel);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.82rem;
+      margin-top: 10px;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      transition: all 0.2s ease;
+    }
+    .donation-btn:hover {
+      background: var(--accent-pastel);
+      color: #0d0f17;
+    }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- NAVIGATION -->
 <div class="top-nav">
-  <span class="brand">🔥 Kink Match</span>
-  <button class="sec" id="btn-nav-home">🏠 Menü</button>
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <span>Kink Match</span>
+  </div>
+  <button id="btn-nav-home">Menü</button>
 </div>
 
 <!-- SCREEN 1: HAUPTMENÜ -->
 <div id="screen-menu" class="screen active">
-  <div class="card-box">
-    <h2>Willkommen 🔥</h2>
-    <p style="color: #bfae9c; font-size: 0.9rem;">Entdeckt eure gemeinsamen Fantasien, Vorlieben und Grenzen.</p>
+  <div class="panel">
+    <h2>Eure Vorlieben & Grenzen</h2>
+    <p>Vergleicht eure Intimitäts-Wünsche anonym und findet gemeinsame Nenner.</p>
     
-    <button id="btn-start-standard">🚀 Standard-Quiz starten</button>
-    <button class="sec" id="btn-custom-builder">🛠️ Eigenes Quiz zusammenstellen</button>
+    <button id="btn-start-standard">Standard-Quiz starten</button>
+    <button class="sec" id="btn-custom-builder">Eigenes Quiz erstellen</button>
 
-    <div style="margin-top: 20px; border-top: 1px solid #3d2f28; padding-top: 15px;">
-      <p style="font-size: 0.85rem; font-weight: 800; margin-bottom: 8px;">Raum beitreten oder fortsetzen:</p>
-      <input type="text" id="roomInput" placeholder="4-stelliger Code (z.B. KINK)" maxlength="8">
-      <button class="sec" id="btn-join-room">Raum öffnen 🔑</button>
+    <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+      <p style="font-size: 0.82rem; font-weight: 600; color: var(--text-main); margin-bottom: 10px;">Raum beitreten:</p>
+      <input type="text" id="roomInput" placeholder="Raum-Code (z.B. KINK-1234)" maxlength="12">
+      <button class="sec" id="btn-join-room">Raum öffnen</button>
     </div>
+  </div>
 
-    <div class="support-box">
-      <span>Dir gefällt die App? Hilf mit, die Serverkosten zu decken! ☕</span><br>
-      <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">☕ Einen Kaffee ausgeben</a>
-    </div>
+  <div class="support-box">
+    <span>Gefällt euch die App? Unterstützt die Entwicklung & Serverkosten.</span><br>
+    <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">Entwickler unterstützen</a>
   </div>
 </div>
 
 <!-- SCREEN 2: EINSTELLUNGEN -->
 <div id="screen-config" class="screen">
-  <div class="card-box">
+  <div class="panel">
     <h3>Quiz-Einstellungen</h3>
+    <p>Passe die Auswertung für euer Quiz an.</p>
+    
     <div class="toggle-wrapper">
-      <label for="talkingPointsToggle"><strong>Unterschiede anzeigen</strong><br><small style="color:#bfae9c">Als Gesprächsstoff nach dem Quiz</small></label>
-      <input type="checkbox" id="talkingPointsToggle" checked>
+      <div>
+        <strong style="font-size: 0.9rem; color: var(--text-main);">Gesprächsstoff anzeigen</strong><br>
+        <span style="font-size: 0.78rem; color: var(--text-muted);">Zeigt Themen, wo einer 'Ja' und einer 'Vielleicht' gewählt hat</span>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="talkingPointsToggle" checked>
+        <span class="slider"></span>
+      </label>
     </div>
-    <button id="btn-init-quiz">Quiz jetzt starten 🎯</button>
-    <button class="sec" id="btn-config-back">Zurück zum Menü</button>
+    
+    <button id="btn-init-quiz" style="margin-top: 10px;">Quiz starten</button>
+    <button class="sec" id="btn-config-back">Zurück</button>
   </div>
 </div>
 
 <!-- SCREEN 3: CUSTOM QUIZ BUILDER -->
 <div id="screen-custom-builder" class="screen">
-  <div class="card-box" style="text-align: left; max-height: 75vh; overflow-y: auto;">
-    <h3 style="text-align: center;">Custom Quiz Baukasten</h3>
-    <p style="font-size: 0.82rem; color: #bfae9c;">Wähle Fragen aus dem Pool aus:</p>
+  <div class="panel" style="text-align: left; max-height: 75vh; overflow-y: auto;">
+    <h3 style="text-align: center;">Quiz zusammenstellen</h3>
+    <p style="text-align: center;">Wähle Fragen aus dem Pool oder erstelle eigene.</p>
     
-    <div id="customQuestionsList">Lade Fragen-Pool...</div>
+    <div id="customQuestionsList">Lade Fragen...</div>
     
-    <hr style="border-color: #3d2f28; margin: 15px 0;">
-    <h4>Eigene Frage hinzufügen:</h4>
-    <input type="text" id="customActive" placeholder="Aktiv (z.B. Partner filmen)">
-    <input type="text" id="customPassive" placeholder="Passiv (z.B. Gefilmt werden)">
-    <button class="sec" id="btn-add-custom">+ Frage hinzufügen</button>
+    <div style="margin-top: 20px; border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+      <h4 style="font-size: 0.88rem;">Eigene Frage hinzufügen</h4>
+      <input type="text" id="customActive" placeholder="Aktiv (z.B. Partner massieren)">
+      <input type="text" id="customPassive" placeholder="Passiv (z.B. Massiert werden)">
+      <button class="sec" id="btn-add-custom">+ Hinzufügen</button>
+    </div>
     
-    <button id="btn-save-custom" style="margin-top: 15px;">Custom Quiz starten 🚀</button>
+    <button id="btn-save-custom" style="margin-top: 20px;">Ausgewählte starten</button>
   </div>
 </div>
 
 <!-- SCREEN 4: QUIZ INTERFACE -->
 <div id="screen-quiz" class="screen">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-    <span id="progressText" style="font-weight: 800; font-size: 0.85rem;">Frage 1 / 10</span>
-    <button class="undo" id="btn-undo">↩️ Undo</button>
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+    <span id="progressText" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">Frage 1 / 10</span>
+    <button class="ghost" id="btn-undo">↩ Rückgängig</button>
   </div>
 
   <div class="quiz-container">
     <div class="swipe-card" id="activeCard">
-      <div id="cardQuestionText">Frage lädt...</div>
-      <div class="swipe-hint">👈 Wischen zum Antworten 👉</div>
+      <!-- Indicators for visual drag feedback -->
+      <div class="indicator ind-yes">JA</div>
+      <div class="indicator ind-no">NEIN</div>
+      <div class="indicator ind-super">SUPER JA</div>
+      <div class="indicator ind-maybe">VIELLEICHT</div>
+
+      <span class="role-badge" id="cardRole">AKTIV</span>
+      <div class="card-text" id="cardQuestionText">Frage lädt...</div>
+      <div class="swipe-hint">Wischen oder Buttons tippen</div>
     </div>
   </div>
 
   <div class="controls-grid">
-    <button class="btn-action btn-no" onclick="handleAnswer(0)">Nein</button>
-    <button class="btn-action btn-maybe" onclick="handleAnswer(1)">Vielleicht</button>
-    <button class="btn-action btn-yes" onclick="handleAnswer(2)">Ja</button>
-    <button class="btn-action btn-super" onclick="handleAnswer(3)">Super Ja</button>
+    <button class="btn-action btn-no" onclick="handleAnswer(0)">
+      <span>Nein</span>
+      <span class="sub-text">◄ Wischen</span>
+    </button>
+    <button class="btn-action btn-maybe" onclick="handleAnswer(1)">
+      <span>Vielleicht</span>
+      <span class="sub-text">▼ Wischen</span>
+    </button>
+    <button class="btn-action btn-yes" onclick="handleAnswer(2)">
+      <span>Ja</span>
+      <span class="sub-text">Wischen ►</span>
+    </button>
+    <button class="btn-action btn-super" onclick="handleAnswer(3)">
+      <span>Super Ja</span>
+      <span class="sub-text">▲ Wischen</span>
+    </button>
   </div>
 </div>
 
 <!-- SCREEN 5: ERGEBNISSE -->
 <div id="screen-results" class="screen">
-  <div class="card-box" style="max-height: 80vh; overflow-y: auto;">
-    <h2>Ergebnisse 🔥</h2>
-    <div id="roomCodeDisplay" style="font-weight: 800; color: #ea580c; margin-bottom: 10px;"></div>
+  <div class="panel" style="max-height: 82vh; overflow-y: auto;">
+    <h2>Ergebnisse</h2>
+    <div id="roomCodeDisplay" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-pastel); margin-bottom: 16px;"></div>
     
-    <button id="shareBtn" onclick="shareRoomLink()">Einladungs-Link teilen 💌</button>
-    <p id="shareCounterText" style="font-size: 0.8rem; color: #bfae9c;">Teile den Link mit 3 Personen, um das Kink-Profil freizuschalten! [<span id="refCount">0</span>/3]</p>
+    <button id="shareBtn" onclick="shareRoomLink()">Einladungs-Link teilen</button>
 
-    <div id="matchesOutput"></div>
+    <div id="matchesOutput" style="margin-top: 20px;"></div>
 
     <!-- KINK PROFIL (PIE CHART) -->
-    <div style="margin-top: 25px; border-top: 1px solid #3d2f28; padding-top: 15px;">
-      <h3>Euer Kink-Profil</h3>
-      <div id="chartContainer" style="position: relative; width: 100%; height: 220px;">
+    <div style="margin-top: 24px; border-top: 1px solid var(--border-subtle); padding-top: 20px;">
+      <h3 style="font-size: 1rem;">Euer Kink-Profil</h3>
+      <div id="chartContainer" style="position: relative; width: 100%; height: 220px; margin-top: 12px;">
         <canvas id="kinkChart"></canvas>
-        <div id="chartOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(23,18,16,0.92); display: flex; justify-content: center; align-items: center; flex-direction: column; border-radius: 16px;">
-          <p style="font-size: 0.85rem; padding: 10px;">🔒 Noch gesperrt. Teile deinen Link 3x, um die Visuelle Auswertung freizuschalten!</p>
-        </div>
       </div>
     </div>
 
-    <div class="support-box">
-      <span>Dir gefällt die App? Hilf mit, die Serverkosten zu decken! ☕</span><br>
-      <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">☕ Einen Kaffee ausgeben</a>
-    </div>
-
-    <button class="sec" id="btn-results-home" style="margin-top: 15px;">Zurück zum Hauptmenü</button>
+    <button class="sec" id="btn-results-home" style="margin-top: 20px;">Hauptmenü</button>
   </div>
 </div>
 
@@ -247,10 +562,10 @@
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   } catch(e) { 
-    console.warn("Supabase Inaktiver Modus (Demo-Fallback aktiv):", e); 
+    console.warn("Supabase Fallback Modus aktiv."); 
   }
 
-  // APP STATE
+  // STATE
   let currentRoomCode = null;
   let userRole = 'p1';
   let questions = [];
@@ -262,16 +577,16 @@
   const defaultQuestions = [
     { id: 1, pair_title: 'Ölmassage', text_active: 'Eine ausgiebige Ganzkörpermassage mit Öl geben', text_passive: 'Eine ausgiebige Ganzkörpermassage mit Öl bekommen', tag: 'sensual' },
     { id: 2, pair_title: 'Augenbinde', text_active: 'Dem Gegenüber die Augen verbinden', text_passive: 'Die Augen vom Gegenüber verbunden bekommen', tag: 'sensual' },
-    { id: 3, pair_title: 'Handschellen', text_active: 'Handschellen oder Stofffesseln am Partner anlegen', text_passive: 'Handschellen oder Stofffesseln angelegt bekommen', tag: 'bondage' },
-    { id: 4, pair_title: 'Führung', text_active: 'Die komplette Führung und Befehlskontrolle übernehmen', text_passive: 'Mich komplett unterwerfen und allen Befehlen gehorchen', tag: 'dominance' },
-    { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der flachen Hand auf den Po verteilen', text_passive: 'Spanking mit der flachen Hand auf den Po bekommen', tag: 'impact' }
+    { id: 3, pair_title: 'Fesseln', text_active: 'Handschellen oder Stofffesseln am Partner anlegen', text_passive: 'Handschellen oder Stofffesseln angelegt bekommen', tag: 'bondage' },
+    { id: 4, pair_title: 'Führung', text_active: 'Die komplette Führung im Bett übernehmen', text_passive: 'Dich komplett der Führung des Partners überlassen', tag: 'dominance' },
+    { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der Hand verteilen', text_passive: 'Spanking mit der Hand bekommen', tag: 'impact' }
   ];
 
-  // NAVIGATION LOGIC
+  // NAVIGATION
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const targetScreen = document.getElementById(id);
-    if (targetScreen) targetScreen.classList.add('active');
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
   }
 
   async function startStandardQuiz() {
@@ -322,7 +637,7 @@
     
     document.getElementById('customActive').value = '';
     document.getElementById('customPassive').value = '';
-    alert('Eigene Frage hinzugefügt!');
+    alert('Frage hinzugefügt!');
   }
 
   function saveAndStartCustomQuiz() {
@@ -355,14 +670,15 @@
     cardEl.style.transition = 'none';
     cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
     cardEl.style.opacity = '1';
+    hideIndicators();
 
     if (currentIndex < questions.length) {
       const q = questions[currentIndex];
       const isPassiv = currentIndex % 2 !== 0;
       const text = isPassiv ? q.text_passive : q.text_active;
-      const roleLabel = isPassiv ? " (Passiv)" : " (Aktiv)";
 
-      document.getElementById('cardQuestionText').innerText = text + roleLabel;
+      document.getElementById('cardRole').innerText = isPassiv ? "PASSIV" : "AKTIV";
+      document.getElementById('cardQuestionText').innerText = text;
       document.getElementById('progressText').innerText = `Frage ${currentIndex + 1} / ${questions.length}`;
     } else {
       finishQuiz();
@@ -383,80 +699,112 @@
     }
   }
 
-  // SWIPE ENGINE (TOUCH & POINTER EVENTS)
-  function setupSwipeListeners() {
-    const cardEl = document.getElementById('activeCard');
-    let startX = 0, startY = 0, currentX = 0, currentY = 0;
-    let isDragging = false;
+  /* TOUCH & POINTER SWIPE ENGINE */
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let currentX = 0, currentY = 0;
 
-    cardEl.addEventListener('pointerdown', (e) => {
+  function setupSwipeListeners() {
+    const card = document.getElementById('activeCard');
+    if (!card) return;
+
+    card.addEventListener('pointerdown', (e) => {
       isDragging = true;
       startX = e.clientX;
       startY = e.clientY;
-      cardEl.style.transition = 'none';
-      cardEl.setPointerCapture(e.pointerId);
+      currentX = 0;
+      currentY = 0;
+      card.style.transition = 'none';
+      try { card.setPointerCapture(e.pointerId); } catch(err) {}
     });
 
-    cardEl.addEventListener('pointermove', (e) => {
+    card.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
       currentX = e.clientX - startX;
       currentY = e.clientY - startY;
-      const rotate = currentX * 0.08;
-      cardEl.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
+
+      const rotate = currentX * 0.05;
+      card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
+
+      updateSwipeIndicators(currentX, currentY);
     });
 
-    const handleRelease = (e) => {
+    const handlePointerEnd = (e) => {
       if (!isDragging) return;
       isDragging = false;
-      const threshold = 90;
+      try { card.releasePointerCapture(e.pointerId); } catch(err) {}
 
-      cardEl.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+      const threshold = 75;
+      const absX = Math.abs(currentX);
+      const absY = Math.abs(currentY);
 
-      if (Math.abs(currentX) > Math.abs(currentY)) {
-        // Horizontal Swipe
-        if (currentX > threshold) {
-          // Swipe Right -> YES (2)
-          triggerSwipeOut(cardEl, 500, currentY, 2);
-        } else if (currentX < -threshold) {
-          // Swipe Left -> NO (0)
-          triggerSwipeOut(cardEl, -500, currentY, 0);
+      if (absX > threshold || absY > threshold) {
+        if (absX > absY) {
+          // Horizontal Swipe
+          if (currentX > threshold) {
+            triggerSwipeOut(500, currentY, 2); // Right = Ja
+          } else {
+            triggerSwipeOut(-500, currentY, 0); // Left = Nein
+          }
         } else {
-          resetCardPos(cardEl);
+          // Vertical Swipe
+          if (currentY < -threshold) {
+            triggerSwipeOut(currentX, -500, 3); // Up = Super Ja
+          } else {
+            triggerSwipeOut(currentX, 500, 1); // Down = Vielleicht
+          }
         }
       } else {
-        // Vertical Swipe
-        if (currentY < -threshold) {
-          // Swipe Up -> SUPER YES (3)
-          triggerSwipeOut(cardEl, currentX, -500, 3);
-        } else if (currentY > threshold) {
-          // Swipe Down -> MAYBE (1)
-          triggerSwipeOut(cardEl, currentX, 500, 1);
-        } else {
-          resetCardPos(cardEl);
-        }
+        // Reset Position smoothly
+        card.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
+        card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+        hideIndicators();
       }
-      currentX = 0; currentY = 0;
     };
 
-    cardEl.addEventListener('pointerup', handleRelease);
-    cardEl.addEventListener('pointercancel', handleRelease);
+    card.addEventListener('pointerup', handlePointerEnd);
+    card.addEventListener('pointercancel', handlePointerEnd);
   }
 
-  function resetCardPos(cardEl) {
-    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+  function updateSwipeIndicators(x, y) {
+    const indYes = document.querySelector('.ind-yes');
+    const indNo = document.querySelector('.ind-no');
+    const indSuper = document.querySelector('.ind-super');
+    const indMaybe = document.querySelector('.ind-maybe');
+
+    hideIndicators();
+
+    const absX = Math.abs(x);
+    const absY = Math.abs(y);
+
+    if (absX > absY) {
+      if (x > 20) indYes.style.opacity = Math.min(1, (x - 20) / 60);
+      if (x < -20) indNo.style.opacity = Math.min(1, (-x - 20) / 60);
+    } else {
+      if (y < -20) indSuper.style.opacity = Math.min(1, (-y - 20) / 60);
+      if (y > 20) indMaybe.style.opacity = Math.min(1, (y - 20) / 60);
+    }
   }
 
-  function triggerSwipeOut(cardEl, targetX, targetY, answerValue) {
-    cardEl.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${targetX * 0.1}deg)`;
-    cardEl.style.opacity = '0';
+  function hideIndicators() {
+    document.querySelectorAll('.indicator').forEach(ind => ind.style.opacity = '0');
+  }
+
+  function triggerSwipeOut(targetX, targetY, answerVal) {
+    const card = document.getElementById('activeCard');
+    card.style.transition = 'transform 0.22s ease-out, opacity 0.22s ease-out';
+    card.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${targetX * 0.08}deg)`;
+    card.style.opacity = '0';
+
     setTimeout(() => {
-      handleAnswer(answerValue);
+      hideIndicators();
+      handleAnswer(answerVal);
     }, 200);
   }
 
   async function finishQuiz() {
     showScreen('screen-results');
-    document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
+    document.getElementById('roomCodeDisplay').innerText = `RAUM-CODE: ${currentRoomCode}`;
 
     if (supabaseClient) {
       try {
@@ -481,11 +829,11 @@
     const container = document.getElementById('matchesOutput');
     
     if (!p2 || p2.length === 0) {
-      container.innerHTML = `<p style="color: #bfae9c;">Du hast deinen Teil ausgefüllt! Sende den Code <strong>${currentRoomCode}</strong> an deinen Partner.</p>`;
+      container.innerHTML = `<p style="color: var(--text-muted);">Dein Teil ist ausgefüllt. Teile den Code <strong>${currentRoomCode}</strong> mit deinem Partner, um Ergebnisse zu sehen.</p>`;
       return;
     }
 
-    let html = "<h3>Eure Auswertung</h3>";
+    let html = "<h3 style='margin-bottom: 14px;'>Eure Streiflichter</h3>";
     questions.forEach((q, idx) => {
       const a1 = p1[idx] || 0;
       const a2 = p2[idx] || 0;
@@ -493,13 +841,13 @@
       if (a1 >= 2 && a2 >= 2) {
         const isSuper = a1 === 3 || a2 === 3;
         html += `<div class="match-card ${isSuper ? 'super' : ''}">
-          <div class="match-title">${isSuper ? '🌟 Super Match' : '✅ Match'}: ${q.pair_title}</div>
-          <div class="match-desc">Beide haben Interesse an dieser Aktion!</div>
+          <div class="match-title">${isSuper ? '★ Super Match' : '✓ Match'}: ${q.pair_title}</div>
+          <div class="match-desc">Beide haben Interesse an dieser Aktion.</div>
         </div>`;
       } else if (showTalkingPoints && ((a1 >= 2 && a2 === 1) || (a1 === 1 && a2 >= 2))) {
         html += `<div class="match-card talking">
-          <div class="match-title">⚡ Gesprächsstoff: ${q.pair_title}</div>
-          <div class="match-desc">Einer sagt Ja, einer sagt Vielleicht – perfektes Thema zum Erkunden!</div>
+          <div class="match-title">⚏ Gesprächsstoff: ${q.pair_title}</div>
+          <div class="match-desc">Einer sagt Ja, einer Vielleicht – ein gutes Thema zum Abstimmen.</div>
         </div>`;
       }
     });
@@ -511,10 +859,10 @@
   function shareRoomLink() {
     const url = `${window.location.origin}${window.location.pathname}?ref=${currentRoomCode}`;
     if (navigator.share) {
-      navigator.share({ title: 'Match your Kinks', text: 'Mach mit beim Kink-Match!', url: url });
+      navigator.share({ title: 'Kink Match', text: 'Mach mit beim Kink-Match!', url: url });
     } else {
       navigator.clipboard.writeText(url);
-      alert('Einladungslink in die Zwischenablage kopiert!');
+      alert('Link in die Zwischenablage kopiert!');
     }
   }
 
@@ -537,16 +885,26 @@
         labels: ['Sinnlichkeit', 'Fesseln', 'Dominanz', 'Impact', 'Rollenspiele'],
         datasets: [{
           data: scores,
-          backgroundColor: ['#ea580c', '#d97706', '#0284c7', '#991b1b', '#701a75']
+          backgroundColor: ['#a78bfa', '#34d399', '#818cf8', '#f87171', '#fbbf24'],
+          borderWidth: 0
         }]
       },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        plugins: { 
+          legend: { 
+            position: 'bottom',
+            labels: { color: '#8e93a6', font: { family: 'Plus Jakarta Sans', size: 11 }, padding: 12 } 
+          } 
+        } 
+      }
     });
   }
 
   async function joinRoom() {
     const code = document.getElementById('roomInput').value.trim();
-    if (!code) return alert('Bitte Code eingeben!');
+    if (!code) return alert('Bitte Raum-Code eingeben!');
     currentRoomCode = code;
     userRole = 'p2';
 
@@ -564,18 +922,7 @@
     showScreen('screen-config');
   }
 
-  // GLOBAL BINDINGS
-  window.showScreen = showScreen;
-  window.startStandardQuiz = startStandardQuiz;
-  window.openCustomBuilder = openCustomBuilder;
-  window.addCustomPair = addCustomPair;
-  window.saveAndStartCustomQuiz = saveAndStartCustomQuiz;
-  window.initQuiz = initQuiz;
-  window.handleAnswer = handleAnswer;
-  window.undoLastAnswer = undoLastAnswer;
-  window.joinRoom = joinRoom;
-  window.shareRoomLink = shareRoomLink;
-
+  // EVENT LISTENERS
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-nav-home').addEventListener('click', () => showScreen('screen-menu'));
     document.getElementById('btn-start-standard').addEventListener('click', startStandardQuiz);
