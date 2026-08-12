@@ -109,7 +109,7 @@
 </head>
 <body>
 
-<!-- PERSISTENTER HEADER -->
+<!-- HEADER -->
 <div class="top-nav">
   <span class="brand">🔥 Kink Match</span>
   <button class="sec" onclick="showScreen('screen-menu')">🏠 Menü</button>
@@ -221,16 +221,18 @@
 </div>
 
 <script>
-  // SUPABASE CONFIG (Hier deine echten Daten eintragen)
+  // SUPABASE CONFIG
   const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
   const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   
-  let supabase = null;
+  let supabaseClient = null;
   try {
-    if (!SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
-      supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if (window.supabase && !SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
-  } catch(e) { console.warn("Supabase nicht konfiguriert"); }
+  } catch(e) { 
+    console.warn("Supabase nicht initialisiert - Demo-Modus aktiv"); 
+  }
 
   // APP STATE
   let currentRoomCode = null;
@@ -258,8 +260,8 @@
     currentRoomCode = 'KINK-' + Math.floor(1000 + Math.random() * 9000);
     userRole = 'p1';
     
-    if (supabase) {
-      const { data } = await supabase.from('questions').select('*');
+    if (supabaseClient) {
+      const { data } = await supabaseClient.from('questions').select('*');
       questions = (data && data.length > 0) ? data : defaultQuestions;
     } else {
       questions = defaultQuestions;
@@ -358,13 +360,13 @@
     showScreen('screen-results');
     document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
 
-    if (supabase) {
+    if (supabaseClient) {
       let updatePayload = {};
       updatePayload[userRole + '_answers'] = userAnswers;
       updatePayload['settings'] = { show_talking_points: showTalkingPoints };
 
-      await supabase.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
-      const { data: roomData } = await supabase.from('rooms').select('*').eq('room_code', currentRoomCode).single();
+      await supabaseClient.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
+      const { data: roomData } = await supabaseClient.from('rooms').select('*').eq('room_code', currentRoomCode).single();
       evaluateResults(roomData);
     } else {
       evaluateResults({ p1_answers: userAnswers, p2_answers: [] });
@@ -445,8 +447,8 @@
     currentRoomCode = code;
     userRole = 'p2';
 
-    if (supabase) {
-      const { data } = await supabase.from('questions').select('*');
+    if (supabaseClient) {
+      const { data } = await supabaseClient.from('questions').select('*');
       questions = (data && data.length > 0) ? data : defaultQuestions;
     } else {
       questions = defaultQuestions;
