@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Match your Kinks - Full Edition</title>
+  <title>Match your Kinks</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
@@ -19,61 +19,58 @@
       font-family: 'Nunito', sans-serif;
       background-color: #171210;
       color: #f3ebd9;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center;
       min-height: 100vh;
+      padding-bottom: 30px;
     }
 
-    .header-title {
-      font-size: 1.4rem; font-weight: 900; color: #ea580c;
-      letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; margin-bottom: 15px;
+    /* PERSISTENTE NAVIGATION OBEN */
+    .top-nav {
+      width: 100%; max-width: 440px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 20px; background: #1f1814;
+      border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;
     }
+    .top-nav .brand { font-size: 1.1rem; font-weight: 900; color: #ea580c; text-transform: uppercase; }
+    .top-nav button { width: auto; margin: 0; padding: 6px 14px; font-size: 0.85rem; background: #332822; }
 
     .screen { display: none; width: 90%; max-width: 420px; text-align: center; }
     .screen.active { display: block; }
 
     .card-box {
-      background: #241c18; padding: 25px; border-radius: 28px;
+      background: #241c18; padding: 22px; border-radius: 24px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     /* BUTTONS & INPUTS */
     button {
-      background: #ea580c; color: white; border: none; padding: 14px 24px;
-      font-size: 1rem; font-family: 'Nunito', sans-serif; border-radius: 25px;
+      background: #ea580c; color: white; border: none; padding: 14px 20px;
+      font-size: 1rem; font-family: 'Nunito', sans-serif; border-radius: 20px;
       cursor: pointer; font-weight: 800; width: 100%; margin: 8px 0;
       box-shadow: 0 6px 16px rgba(234, 88, 12, 0.3); transition: transform 0.15s ease;
     }
     button:active { transform: scale(0.97); }
     button.sec { background: #332822; color: #f3ebd9; box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
-    button.undo { background: #475569; width: auto; padding: 8px 18px; font-size: 0.9rem; }
+    button.undo { background: #475569; width: auto; padding: 8px 16px; font-size: 0.85rem; }
 
     input[type="text"] {
-      width: 100%; padding: 14px; border-radius: 16px; border: 1px solid #44352c;
-      background: #1a1412; color: #fff; font-size: 1rem; text-align: center; margin-bottom: 12px;
+      width: 100%; padding: 12px; border-radius: 14px; border: 1px solid #44352c;
+      background: #1a1412; color: #fff; font-size: 0.95rem; text-align: center; margin-bottom: 10px;
     }
 
     /* QUIZ SWIPE CARD */
-    .quiz-container { height: 420px; position: relative; margin-top: 10px; }
+    .quiz-container { height: 380px; position: relative; margin-top: 10px; }
     .swipe-card {
-      position: absolute; width: 100%; height: 100%; border-radius: 28px;
-      padding: 28px; display: flex; flex-direction: column; justify-content: center;
-      align-items: center; color: white; font-size: 1.35rem; font-weight: 800;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.6); touch-action: none;
-      transition: transform 0.1s ease, opacity 0.1s ease;
+      position: absolute; width: 100%; height: 100%; border-radius: 24px;
+      padding: 24px; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; color: white; font-size: 1.25rem; font-weight: 800;
+      background: #2a201b; border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
     }
 
-    .badge {
-      position: absolute; top: 20px; padding: 6px 14px; border-radius: 12px;
-      font-size: 0.95rem; font-weight: 900; opacity: 0;
-    }
-    .badge-no { left: 20px; background: #b91c1c; color: #fff; }
-    .badge-maybe { top: 60px; background: #d97706; color: #fff; }
-    .badge-yes { right: 20px; background: #15803d; color: #fff; }
-    .badge-super { top: 20px; background: #0284c7; color: #fff; }
-
-    .controls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-    .btn-action { padding: 12px 5px; font-size: 0.85rem; border-radius: 16px; margin: 0; }
+    .controls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 15px; }
+    .btn-action { padding: 12px 2px; font-size: 0.8rem; border-radius: 14px; margin: 0; }
     .btn-no { background: #991b1b; }
     .btn-maybe { background: #d97706; }
     .btn-yes { background: #15803d; }
@@ -81,57 +78,83 @@
 
     /* RESULTS */
     .match-card {
-      background: #2e241f; padding: 14px; border-radius: 16px; text-align: left;
-      margin-bottom: 10px; border-left: 5px solid #22c55e;
+      background: #2e241f; padding: 12px; border-radius: 14px; text-align: left;
+      margin-bottom: 8px; border-left: 5px solid #22c55e;
     }
     .match-card.super { border-left-color: #38bdf8; }
     .match-card.talking { border-left-color: #f59e0b; }
-    .match-title { font-weight: 900; font-size: 1.05rem; }
-    .match-desc { font-size: 0.88rem; color: #bfae9c; margin-top: 4px; }
+    .match-title { font-weight: 900; font-size: 0.98rem; }
+    .match-desc { font-size: 0.82rem; color: #bfae9c; margin-top: 3px; }
 
     .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; text-align: left; }
     .toggle-wrapper input { width: 20px; height: 20px; accent-color: #ea580c; }
+
+    /* SPENDEN / SUPPORT FOOTER */
+    .support-box {
+      margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem; color: #bfae9c; text-align: center;
+    }
+    .donation-btn {
+      display: inline-block; background: #2a201b; color: #f3ebd9; text-decoration: none;
+      padding: 8px 16px; border-radius: 16px; font-weight: 800; font-size: 0.85rem;
+      margin-top: 8px; border: 1px solid rgba(234, 88, 12, 0.5); transition: all 0.2s ease;
+    }
+    .donation-btn:hover { background: #ea580c; color: #fff; }
+
+    /* CUSTOM BUILDER LIST */
+    .q-item { display: flex; align-items: center; gap: 10px; text-align: left; padding: 6px 0; border-bottom: 1px solid #332822; font-size: 0.85rem; }
+    .q-item input { width: 18px; height: 18px; accent-color: #ea580c; }
   </style>
 </head>
 <body>
 
-<div class="header-title">100 - Match your Kinks</div>
+<!-- PERSISTENTER HEADER -->
+<div class="top-nav">
+  <span class="brand">🔥 Kink Match</span>
+  <button class="sec" onclick="showScreen('screen-menu')">🏠 Menü</button>
+</div>
 
 <!-- SCREEN 1: HAUPTMENÜ -->
 <div id="screen-menu" class="screen active">
   <div class="card-box">
     <h2>Willkommen 🔥</h2>
-    <p style="color: #bfae9c; font-size: 0.95rem;">Entdeckt eure gemeinsamen Fantasien, Vorlieben und Grenzen.</p>
+    <p style="color: #bfae9c; font-size: 0.9rem;">Entdeckt eure gemeinsamen Fantasien, Vorlieben und Grenzen.</p>
     
     <button onclick="startStandardQuiz()">🚀 Standard-Quiz starten</button>
-    <button class="sec" onclick="showScreen('screen-custom-builder')">🛠️ Eigenes Quiz zusammenstellen</button>
+    <button class="sec" onclick="openCustomBuilder()">🛠️ Eigenes Quiz zusammenstellen</button>
 
     <div style="margin-top: 20px; border-top: 1px solid #3d2f28; padding-top: 15px;">
-      <p style="font-size: 0.9rem; font-weight: 800;">Raum beitreten oder fortsetzen:</p>
+      <p style="font-size: 0.85rem; font-weight: 800; margin-bottom: 8px;">Raum beitreten oder fortsetzen:</p>
       <input type="text" id="roomInput" placeholder="4-stelliger Code (z.B. KINK)" maxlength="8">
       <button class="sec" onclick="joinRoom()">Raum öffnen 🔑</button>
+    </div>
+
+    <div class="support-box">
+      <span>Dir gefällt die App? Hilf mit, die Serverkosten zu decken! ☕</span><br>
+      <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">☕ Einen Kaffee ausgeben</a>
     </div>
   </div>
 </div>
 
-<!-- SCREEN 2: EINSTELLUNGEN & KATEGORIEN -->
+<!-- SCREEN 2: EINSTELLUNGEN -->
 <div id="screen-config" class="screen">
   <div class="card-box">
-    <h3>Einstellungen</h3>
+    <h3>Quiz-Einstellungen</h3>
     <div class="toggle-wrapper">
       <label for="talkingPointsToggle"><strong>Unterschiede anzeigen</strong><br><small style="color:#bfae9c">Als Gesprächsstoff nach dem Quiz</small></label>
       <input type="checkbox" id="talkingPointsToggle" checked>
     </div>
     <button onclick="initQuiz()">Quiz jetzt starten 🎯</button>
-    <button class="sec" onclick="showScreen('screen-menu')">Zurück</button>
+    <button class="sec" onclick="showScreen('screen-menu')">Zurück zum Menü</button>
   </div>
 </div>
 
 <!-- SCREEN 3: CUSTOM QUIZ BUILDER -->
 <div id="screen-custom-builder" class="screen">
-  <div class="card-box" style="text-align: left; max-height: 80vh; overflow-y: auto;">
+  <div class="card-box" style="text-align: left; max-height: 75vh; overflow-y: auto;">
     <h3 style="text-align: center;">Custom Quiz Baukasten</h3>
-    <p style="font-size: 0.85rem; color: #bfae9c;">Wähle Fragen aus oder füge eigene hinzu:</p>
+    <p style="font-size: 0.82rem; color: #bfae9c;">Wähle Fragen aus dem Pool aus:</p>
     
     <div id="customQuestionsList">Lade Fragen-Pool...</div>
     
@@ -147,17 +170,13 @@
 
 <!-- SCREEN 4: QUIZ INTERFACE -->
 <div id="screen-quiz" class="screen">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <span id="progressText" style="font-weight: 800; font-size: 0.9rem;">Frage 1 / 100</span>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+    <span id="progressText" style="font-weight: 800; font-size: 0.85rem;">Frage 1 / 10</span>
     <button class="undo" onclick="undoLastAnswer()">↩️ Undo</button>
   </div>
 
-  <div class="quiz-container" id="quizContainer">
+  <div class="quiz-container">
     <div class="swipe-card" id="activeCard">
-      <div class="badge badge-no">NEIN</div>
-      <div class="badge badge-maybe">VIELLEICHT</div>
-      <div class="badge badge-yes">JA</div>
-      <div class="badge badge-super">SUPER JA</div>
       <div id="cardQuestionText">Frage lädt...</div>
     </div>
   </div>
@@ -172,48 +191,56 @@
 
 <!-- SCREEN 5: ERGEBNISSE -->
 <div id="screen-results" class="screen">
-  <div class="card-box" style="max-height: 85vh; overflow-y: auto;">
+  <div class="card-box" style="max-height: 80vh; overflow-y: auto;">
     <h2>Ergebnisse 🔥</h2>
     <div id="roomCodeDisplay" style="font-weight: 800; color: #ea580c; margin-bottom: 10px;"></div>
     
     <button id="shareBtn" onclick="shareRoomLink()">Einladungs-Link teilen 💌</button>
-    <p id="shareCounterText" style="font-size: 0.8rem; color: #bfae9c;">Teile den Link mit 3 Personen, um das Kink-Profil (Pie Chart) freizuschalten! [<span id="refCount">0</span>/3]</p>
+    <p id="shareCounterText" style="font-size: 0.8rem; color: #bfae9c;">Teile den Link mit 3 Personen, um das Kink-Profil freizuschalten! [<span id="refCount">0</span>/3]</p>
 
     <div id="matchesOutput"></div>
 
     <!-- KINK PROFIL (PIE CHART) -->
     <div style="margin-top: 25px; border-top: 1px solid #3d2f28; padding-top: 15px;">
       <h3>Euer Kink-Profil</h3>
-      <div id="chartContainer" style="position: relative; width: 100%; height: 250px;">
+      <div id="chartContainer" style="position: relative; width: 100%; height: 220px;">
         <canvas id="kinkChart"></canvas>
         <div id="chartOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(23,18,16,0.92); display: flex; justify-content: center; align-items: center; flex-direction: column; border-radius: 16px;">
-          <p style="font-size: 0.9rem; padding: 10px;">🔒 Noch gesperrt. Teile deinen Link 3x, um die Visuelle Auswertung freizuschalten!</p>
+          <p style="font-size: 0.85rem; padding: 10px;">🔒 Noch gesperrt. Teile deinen Link 3x, um die Visuelle Auswertung freizuschalten!</p>
         </div>
       </div>
     </div>
 
-    <button class="sec" onclick="showScreen('screen-menu')" style="margin-top: 20px;">Hauptmenü</button>
+    <div class="support-box">
+      <span>Dir gefällt die App? Hilf mit, die Serverkosten zu decken! ☕</span><br>
+      <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">☕ Einen Kaffee ausgeben</a>
+    </div>
+
+    <button class="sec" onclick="showScreen('screen-menu')" style="margin-top: 15px;">Zurück zum Hauptmenü</button>
   </div>
 </div>
 
 <script>
-  // =========================================================
-  // SUPABASE CONFIGURATION
-  // =========================================================
-  const SUPABASE_URL = 'https://ejmqcerdposyrcyxjefu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbXFjZXJkcG9zeXJjeXhqZWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NDQyODMsImV4cCI6MjEwMjEyMDI4M30.viPcp_bdceYEmhFSHNF04OoKhK2CYAvUxo6ehm01J-Y';
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // SUPABASE CONFIG (Hier deine echten Daten eintragen)
+  const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+  
+  let supabase = null;
+  try {
+    if (!SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
+      supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+  } catch(e) { console.warn("Supabase nicht konfiguriert"); }
 
   // APP STATE
   let currentRoomCode = null;
-  let userRole = 'p1'; // 'p1' oder 'p2'
+  let userRole = 'p1';
   let questions = [];
   let userAnswers = [];
   let currentIndex = 0;
   let showTalkingPoints = true;
-  let referralCount = 0;
+  let customPairs = [];
 
-  // SAMPLE QUESTIONS FALLBACK
   const defaultQuestions = [
     { id: 1, pair_title: 'Ölmassage', text_active: 'Eine ausgiebige Ganzkörpermassage mit Öl geben', text_passive: 'Eine ausgiebige Ganzkörpermassage mit Öl bekommen', tag: 'sensual' },
     { id: 2, pair_title: 'Augenbinde', text_active: 'Dem Gegenüber die Augen verbinden', text_passive: 'Die Augen vom Gegenüber verbunden bekommen', tag: 'sensual' },
@@ -222,25 +249,75 @@
     { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der flachen Hand auf den Po verteilen', text_passive: 'Spanking mit der flachen Hand auf den Po bekommen', tag: 'impact' }
   ];
 
-  // SCREEN SWITCHER
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
   }
 
-  // START STANDARD QUIZ
   async function startStandardQuiz() {
     currentRoomCode = 'KINK-' + Math.floor(1000 + Math.random() * 9000);
     userRole = 'p1';
     
-    // Fragen aus Supabase laden oder Fallback
-    const { data } = await supabase.from('questions').select('*');
-    questions = (data && data.length > 0) ? data : defaultQuestions;
+    if (supabase) {
+      const { data } = await supabase.from('questions').select('*');
+      questions = (data && data.length > 0) ? data : defaultQuestions;
+    } else {
+      questions = defaultQuestions;
+    }
     
     showScreen('screen-config');
   }
 
-  // INIT QUIZ
+  function openCustomBuilder() {
+    showScreen('screen-custom-builder');
+    const container = document.getElementById('customQuestionsList');
+    let pool = (questions.length > 0) ? questions : defaultQuestions;
+    
+    let html = '';
+    pool.forEach(q => {
+      html += `<div class="q-item">
+        <input type="checkbox" id="q_${q.id}" value="${q.id}" checked>
+        <label for="q_${q.id}">${q.pair_title}</label>
+      </div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function addCustomPair() {
+    const act = document.getElementById('customActive').value.trim();
+    const pas = document.getElementById('customPassive').value.trim();
+    if (!act || !pas) return alert('Bitte Aktiv- und Passiv-Text eingeben!');
+    
+    customPairs.push({
+      id: 'custom_' + Date.now(),
+      pair_title: act,
+      text_active: act,
+      text_passive: pas,
+      tag: 'sensual'
+    });
+    
+    document.getElementById('customActive').value = '';
+    document.getElementById('customPassive').value = '';
+    alert('Eigene Frage hinzugefügt!');
+  }
+
+  function saveAndStartCustomQuiz() {
+    let pool = (questions.length > 0) ? questions : defaultQuestions;
+    let selected = [];
+    
+    pool.forEach(q => {
+      let el = document.getElementById(`q_${q.id}`);
+      if (el && el.checked) selected.push(q);
+    });
+
+    questions = [...selected, ...customPairs];
+    if (questions.length === 0) return alert('Bitte mindestens 1 Frage auswählen!');
+
+    currentRoomCode = 'KINK-' + Math.floor(1000 + Math.random() * 9000);
+    userRole = 'p1';
+    showScreen('screen-config');
+  }
+
   function initQuiz() {
     showTalkingPoints = document.getElementById('talkingPointsToggle').checked;
     userAnswers = [];
@@ -249,11 +326,9 @@
     renderCard();
   }
 
-  // RENDER CARD
   function renderCard() {
     if (currentIndex < questions.length) {
       const q = questions[currentIndex];
-      // Alternierende Anzeige: Gerade Indizes = Aktiv, Ungerade = Passiv
       const isPassiv = currentIndex % 2 !== 0;
       const text = isPassiv ? q.text_passive : q.text_active;
       const roleLabel = isPassiv ? " (Passiv)" : " (Aktiv)";
@@ -265,14 +340,12 @@
     }
   }
 
-  // HANDLE ANSWER
   function handleAnswer(val) {
     userAnswers.push(val);
     currentIndex++;
     renderCard();
   }
 
-  // UNDO LAST ANSWER
   function undoLastAnswer() {
     if (currentIndex > 0) {
       currentIndex--;
@@ -281,26 +354,23 @@
     }
   }
 
-  // FINISH QUIZ & SYNC
   async function finishQuiz() {
     showScreen('screen-results');
     document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
 
-    // Raum in Supabase speichern
-    let updatePayload = {};
-    updatePayload[userRole + '_answers'] = userAnswers;
-    updatePayload['settings'] = { show_talking_points: showTalkingPoints };
+    if (supabase) {
+      let updatePayload = {};
+      updatePayload[userRole + '_answers'] = userAnswers;
+      updatePayload['settings'] = { show_talking_points: showTalkingPoints };
 
-    await supabase.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
-
-    // Daten für Auswertung abrufen
-    const { data: roomData } = await supabase.from('rooms').select('*').eq('room_code', currentRoomCode).single();
-    
-    evaluateResults(roomData);
-    checkReferrals();
+      await supabase.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
+      const { data: roomData } = await supabase.from('rooms').select('*').eq('room_code', currentRoomCode).single();
+      evaluateResults(roomData);
+    } else {
+      evaluateResults({ p1_answers: userAnswers, p2_answers: [] });
+    }
   }
 
-  // EVALUATE MATCHES & TALKING POINTS
   function evaluateResults(room) {
     const p1 = room ? room.p1_answers : userAnswers;
     const p2 = room ? room.p2_answers : [];
@@ -312,27 +382,21 @@
     }
 
     let html = "<h3>Eure Auswertung</h3>";
-    
     questions.forEach((q, idx) => {
       const a1 = p1[idx] || 0;
       const a2 = p2[idx] || 0;
 
-      // Volles Match
       if (a1 >= 2 && a2 >= 2) {
         const isSuper = a1 === 3 || a2 === 3;
-        html += `
-          <div class="match-card ${isSuper ? 'super' : ''}">
-            <div class="match-title">${isSuper ? '🌟 Super Match' : '✅ Match'}: ${q.pair_title}</div>
-            <div class="match-desc">Beide haben Interesse an dieser Aktion!</div>
-          </div>`;
-      } 
-      // Talking Points (bei Option)
-      else if (showTalkingPoints && ((a1 >= 2 && a2 === 1) || (a1 === 1 && a2 >= 2))) {
-        html += `
-          <div class="match-card talking">
-            <div class="match-title">⚡ Gesprächsstoff: ${q.pair_title}</div>
-            <div class="match-desc">Einer sagt Ja, einer sagt Vielleicht – perfektes Thema zum Erkunden!</div>
-          </div>`;
+        html += `<div class="match-card ${isSuper ? 'super' : ''}">
+          <div class="match-title">${isSuper ? '🌟 Super Match' : '✅ Match'}: ${q.pair_title}</div>
+          <div class="match-desc">Beide haben Interesse an dieser Aktion!</div>
+        </div>`;
+      } else if (showTalkingPoints && ((a1 >= 2 && a2 === 1) || (a1 === 1 && a2 >= 2))) {
+        html += `<div class="match-card talking">
+          <div class="match-title">⚡ Gesprächsstoff: ${q.pair_title}</div>
+          <div class="match-desc">Einer sagt Ja, einer sagt Vielleicht – perfektes Thema zum Erkunden!</div>
+        </div>`;
       }
     });
 
@@ -340,7 +404,6 @@
     renderPieChart(p1, p2);
   }
 
-  // SHARE LINK & REFERRAL SYSTEM
   function shareRoomLink() {
     const url = `${window.location.origin}${window.location.pathname}?ref=${currentRoomCode}`;
     if (navigator.share) {
@@ -351,25 +414,6 @@
     }
   }
 
-  // REFERRAL TRACKER
-  async function checkReferrals() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const ref = urlParams.get('ref');
-
-    if (ref) {
-      await supabase.from('referrals').insert([{ ref_code: ref, visitor_hash: Math.random().toString() }]);
-    }
-
-    const { count } = await supabase.from('referrals').select('*', { count: 'exact', head: true }).eq('ref_code', currentRoomCode);
-    referralCount = count || 0;
-    document.getElementById('refCount').innerText = referralCount;
-
-    if (referralCount >= 3) {
-      document.getElementById('chartOverlay').style.display = 'none';
-    }
-  }
-
-  // PIE CHART RENDERER
   function renderPieChart(p1, p2) {
     const ctx = document.getElementById('kinkChart').getContext('2d');
     const categories = ['sensual', 'bondage', 'dominance', 'impact', 'roleplay'];
@@ -395,15 +439,18 @@
     });
   }
 
-  // JOIN ROOM VIA INPUT
   async function joinRoom() {
     const code = document.getElementById('roomInput').value.trim();
     if (!code) return alert('Bitte Code eingeben!');
     currentRoomCode = code;
     userRole = 'p2';
 
-    const { data } = await supabase.from('questions').select('*');
-    questions = (data && data.length > 0) ? data : defaultQuestions;
+    if (supabase) {
+      const { data } = await supabase.from('questions').select('*');
+      questions = (data && data.length > 0) ? data : defaultQuestions;
+    } else {
+      questions = defaultQuestions;
+    }
     
     showScreen('screen-config');
   }
