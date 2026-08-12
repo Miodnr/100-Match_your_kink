@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Match your Kinks</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    * { box-sizing: border-box; user-select: none; }
+    * { box-sizing: border-box; user-select: none; -webkit-user-drag: none; }
     body {
       margin: 0; padding: 0;
       font-family: 'Nunito', sans-serif;
@@ -22,6 +22,7 @@
       display: flex; flex-direction: column; align-items: center;
       min-height: 100vh;
       padding-bottom: 30px;
+      touch-action: pan-y;
     }
 
     /* PERSISTENTE NAVIGATION OBEN */
@@ -34,7 +35,7 @@
     .top-nav .brand { font-size: 1.1rem; font-weight: 900; color: #ea580c; text-transform: uppercase; }
     .top-nav button { width: auto; margin: 0; padding: 6px 14px; font-size: 0.85rem; background: #332822; }
 
-    /* SCREEN MANAGEMENT (MIT !IMPORTANT FIX) */
+    /* SCREEN MANAGEMENT */
     .screen { display: none !important; width: 90%; max-width: 420px; text-align: center; }
     .screen.active { display: block !important; }
 
@@ -60,14 +61,27 @@
       background: #1a1412; color: #fff; font-size: 0.95rem; text-align: center; margin-bottom: 10px;
     }
 
-    /* QUIZ SWIPE CARD */
-    .quiz-container { height: 380px; position: relative; margin-top: 10px; }
+    /* QUIZ SWIPE CARD CONTAINER */
+    .quiz-container { 
+      height: 380px; 
+      position: relative; 
+      margin-top: 10px;
+      perspective: 1000px;
+    }
     .swipe-card {
       position: absolute; width: 100%; height: 100%; border-radius: 24px;
       padding: 24px; display: flex; flex-direction: column; justify-content: center;
       align-items: center; color: white; font-size: 1.25rem; font-weight: 800;
       background: #2a201b; border: 1px solid rgba(255,255,255,0.1);
       box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+      touch-action: none; cursor: grab;
+      will-change: transform;
+    }
+    .swipe-card:active { cursor: grabbing; }
+
+    .swipe-hint {
+      position: absolute; bottom: 12px; font-size: 0.75rem; color: rgba(255,255,255,0.3);
+      pointer-events: none; text-transform: uppercase; letter-spacing: 1px;
     }
 
     .controls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 15px; }
@@ -179,6 +193,7 @@
   <div class="quiz-container">
     <div class="swipe-card" id="activeCard">
       <div id="cardQuestionText">Frage lädt...</div>
+      <div class="swipe-hint">👈 Wischen zum Antworten 👉</div>
     </div>
   </div>
 
@@ -222,7 +237,7 @@
 </div>
 
 <script>
-  // 1. SUPABASE SAFE CONFIG
+  // SUPABASE CONFIG
   const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
   const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   
@@ -235,7 +250,7 @@
     console.warn("Supabase Inaktiver Modus (Demo-Fallback aktiv):", e); 
   }
 
-  // 2. APP STATE
+  // APP STATE
   let currentRoomCode = null;
   let userRole = 'p1';
   let questions = [];
@@ -252,18 +267,11 @@
     { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der flachen Hand auf den Po verteilen', text_passive: 'Spanking mit der flachen Hand auf den Po bekommen', tag: 'impact' }
   ];
 
-  // 3. CORE NAVIGATION LOGIC
+  // NAVIGATION LOGIC
   function showScreen(id) {
-    console.log("Wechsle zu Screen:", id);
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(s => s.classList.remove('active'));
-    
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const targetScreen = document.getElementById(id);
-    if (targetScreen) {
-      targetScreen.classList.add('active');
-    } else {
-      console.error("Screen nicht gefunden:", id);
-    }
+    if (targetScreen) targetScreen.classList.add('active');
   }
 
   async function startStandardQuiz() {
@@ -275,7 +283,6 @@
         const { data, error } = await supabaseClient.from('questions').select('*');
         questions = (data && data.length > 0 && !error) ? data : defaultQuestions;
       } catch(err) {
-        console.warn("Supabase Abfrage fehlgeschlagen, nutze Fallback:", err);
         questions = defaultQuestions;
       }
     } else {
@@ -344,6 +351,11 @@
   }
 
   function renderCard() {
+    const cardEl = document.getElementById('activeCard');
+    cardEl.style.transition = 'none';
+    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    cardEl.style.opacity = '1';
+
     if (currentIndex < questions.length) {
       const q = questions[currentIndex];
       const isPassiv = currentIndex % 2 !== 0;
@@ -371,6 +383,77 @@
     }
   }
 
+  // SWIPE ENGINE (TOUCH & POINTER EVENTS)
+  function setupSwipeListeners() {
+    const cardEl = document.getElementById('activeCard');
+    let startX = 0, startY = 0, currentX = 0, currentY = 0;
+    let isDragging = false;
+
+    cardEl.addEventListener('pointerdown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      cardEl.style.transition = 'none';
+      cardEl.setPointerCapture(e.pointerId);
+    });
+
+    cardEl.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      const rotate = currentX * 0.08;
+      cardEl.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
+    });
+
+    const handleRelease = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const threshold = 90;
+
+      cardEl.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+
+      if (Math.abs(currentX) > Math.abs(currentY)) {
+        // Horizontal Swipe
+        if (currentX > threshold) {
+          // Swipe Right -> YES (2)
+          triggerSwipeOut(cardEl, 500, currentY, 2);
+        } else if (currentX < -threshold) {
+          // Swipe Left -> NO (0)
+          triggerSwipeOut(cardEl, -500, currentY, 0);
+        } else {
+          resetCardPos(cardEl);
+        }
+      } else {
+        // Vertical Swipe
+        if (currentY < -threshold) {
+          // Swipe Up -> SUPER YES (3)
+          triggerSwipeOut(cardEl, currentX, -500, 3);
+        } else if (currentY > threshold) {
+          // Swipe Down -> MAYBE (1)
+          triggerSwipeOut(cardEl, currentX, 500, 1);
+        } else {
+          resetCardPos(cardEl);
+        }
+      }
+      currentX = 0; currentY = 0;
+    };
+
+    cardEl.addEventListener('pointerup', handleRelease);
+    cardEl.addEventListener('pointercancel', handleRelease);
+  }
+
+  function resetCardPos(cardEl) {
+    cardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+  }
+
+  function triggerSwipeOut(cardEl, targetX, targetY, answerValue) {
+    cardEl.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${targetX * 0.1}deg)`;
+    cardEl.style.opacity = '0';
+    setTimeout(() => {
+      handleAnswer(answerValue);
+    }, 200);
+  }
+
   async function finishQuiz() {
     showScreen('screen-results');
     document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
@@ -385,7 +468,6 @@
         const { data: roomData } = await supabaseClient.from('rooms').select('*').eq('room_code', currentRoomCode).single();
         evaluateResults(roomData);
       } catch(err) {
-        console.warn("Ergebnis-Sync fehlgeschlagen:", err);
         evaluateResults({ p1_answers: userAnswers, p2_answers: [] });
       }
     } else {
@@ -437,10 +519,7 @@
   }
 
   function renderPieChart(p1, p2) {
-    if (typeof Chart === 'undefined') {
-      console.warn("Chart.js nicht verfügbar.");
-      return;
-    }
+    if (typeof Chart === 'undefined') return;
     const ctx = document.getElementById('kinkChart').getContext('2d');
     const categories = ['sensual', 'bondage', 'dominance', 'impact', 'roleplay'];
     const scores = [0, 0, 0, 0, 0];
@@ -485,7 +564,7 @@
     showScreen('screen-config');
   }
 
-  // GLOBAL BINDINGS & EVENT LISTENERS
+  // GLOBAL BINDINGS
   window.showScreen = showScreen;
   window.startStandardQuiz = startStandardQuiz;
   window.openCustomBuilder = openCustomBuilder;
@@ -508,6 +587,8 @@
     document.getElementById('btn-save-custom').addEventListener('click', saveAndStartCustomQuiz);
     document.getElementById('btn-undo').addEventListener('click', undoLastAnswer);
     document.getElementById('btn-results-home').addEventListener('click', () => showScreen('screen-menu'));
+    
+    setupSwipeListeners();
   });
 </script>
 </body>
