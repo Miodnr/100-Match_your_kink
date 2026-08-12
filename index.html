@@ -34,8 +34,9 @@
     .top-nav .brand { font-size: 1.1rem; font-weight: 900; color: #ea580c; text-transform: uppercase; }
     .top-nav button { width: auto; margin: 0; padding: 6px 14px; font-size: 0.85rem; background: #332822; }
 
-    .screen { display: none; width: 90%; max-width: 420px; text-align: center; }
-    .screen.active { display: block; }
+    /* SCREEN MANAGEMENT (MIT !IMPORTANT FIX) */
+    .screen { display: none !important; width: 90%; max-width: 420px; text-align: center; }
+    .screen.active { display: block !important; }
 
     .card-box {
       background: #241c18; padding: 22px; border-radius: 24px;
@@ -112,7 +113,7 @@
 <!-- HEADER -->
 <div class="top-nav">
   <span class="brand">🔥 Kink Match</span>
-  <button class="sec" onclick="showScreen('screen-menu')">🏠 Menü</button>
+  <button class="sec" id="btn-nav-home">🏠 Menü</button>
 </div>
 
 <!-- SCREEN 1: HAUPTMENÜ -->
@@ -121,13 +122,13 @@
     <h2>Willkommen 🔥</h2>
     <p style="color: #bfae9c; font-size: 0.9rem;">Entdeckt eure gemeinsamen Fantasien, Vorlieben und Grenzen.</p>
     
-    <button onclick="startStandardQuiz()">🚀 Standard-Quiz starten</button>
-    <button class="sec" onclick="openCustomBuilder()">🛠️ Eigenes Quiz zusammenstellen</button>
+    <button id="btn-start-standard">🚀 Standard-Quiz starten</button>
+    <button class="sec" id="btn-custom-builder">🛠️ Eigenes Quiz zusammenstellen</button>
 
     <div style="margin-top: 20px; border-top: 1px solid #3d2f28; padding-top: 15px;">
       <p style="font-size: 0.85rem; font-weight: 800; margin-bottom: 8px;">Raum beitreten oder fortsetzen:</p>
       <input type="text" id="roomInput" placeholder="4-stelliger Code (z.B. KINK)" maxlength="8">
-      <button class="sec" onclick="joinRoom()">Raum öffnen 🔑</button>
+      <button class="sec" id="btn-join-room">Raum öffnen 🔑</button>
     </div>
 
     <div class="support-box">
@@ -145,8 +146,8 @@
       <label for="talkingPointsToggle"><strong>Unterschiede anzeigen</strong><br><small style="color:#bfae9c">Als Gesprächsstoff nach dem Quiz</small></label>
       <input type="checkbox" id="talkingPointsToggle" checked>
     </div>
-    <button onclick="initQuiz()">Quiz jetzt starten 🎯</button>
-    <button class="sec" onclick="showScreen('screen-menu')">Zurück zum Menü</button>
+    <button id="btn-init-quiz">Quiz jetzt starten 🎯</button>
+    <button class="sec" id="btn-config-back">Zurück zum Menü</button>
   </div>
 </div>
 
@@ -162,9 +163,9 @@
     <h4>Eigene Frage hinzufügen:</h4>
     <input type="text" id="customActive" placeholder="Aktiv (z.B. Partner filmen)">
     <input type="text" id="customPassive" placeholder="Passiv (z.B. Gefilmt werden)">
-    <button class="sec" onclick="addCustomPair()">+ Frage hinzufügen</button>
+    <button class="sec" id="btn-add-custom">+ Frage hinzufügen</button>
     
-    <button onclick="saveAndStartCustomQuiz()" style="margin-top: 15px;">Custom Quiz starten 🚀</button>
+    <button id="btn-save-custom" style="margin-top: 15px;">Custom Quiz starten 🚀</button>
   </div>
 </div>
 
@@ -172,7 +173,7 @@
 <div id="screen-quiz" class="screen">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
     <span id="progressText" style="font-weight: 800; font-size: 0.85rem;">Frage 1 / 10</span>
-    <button class="undo" onclick="undoLastAnswer()">↩️ Undo</button>
+    <button class="undo" id="btn-undo">↩️ Undo</button>
   </div>
 
   <div class="quiz-container">
@@ -216,25 +217,25 @@
       <a href="https://paypal.me/DEIN_NAME" target="_blank" class="donation-btn">☕ Einen Kaffee ausgeben</a>
     </div>
 
-    <button class="sec" onclick="showScreen('screen-menu')" style="margin-top: 15px;">Zurück zum Hauptmenü</button>
+    <button class="sec" id="btn-results-home" style="margin-top: 15px;">Zurück zum Hauptmenü</button>
   </div>
 </div>
 
 <script>
-  // SUPABASE CONFIG
+  // 1. SUPABASE SAFE CONFIG
   const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
   const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
   
   let supabaseClient = null;
   try {
-    if (window.supabase && !SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
+    if (window.supabase && typeof window.supabase.createClient === 'function' && !SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   } catch(e) { 
-    console.warn("Supabase nicht initialisiert - Demo-Modus aktiv"); 
+    console.warn("Supabase Inaktiver Modus (Demo-Fallback aktiv):", e); 
   }
 
-  // APP STATE
+  // 2. APP STATE
   let currentRoomCode = null;
   let userRole = 'p1';
   let questions = [];
@@ -251,9 +252,18 @@
     { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der flachen Hand auf den Po verteilen', text_passive: 'Spanking mit der flachen Hand auf den Po bekommen', tag: 'impact' }
   ];
 
+  // 3. CORE NAVIGATION LOGIC
   function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    console.log("Wechsle zu Screen:", id);
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(s => s.classList.remove('active'));
+    
+    const targetScreen = document.getElementById(id);
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+    } else {
+      console.error("Screen nicht gefunden:", id);
+    }
   }
 
   async function startStandardQuiz() {
@@ -261,8 +271,13 @@
     userRole = 'p1';
     
     if (supabaseClient) {
-      const { data } = await supabaseClient.from('questions').select('*');
-      questions = (data && data.length > 0) ? data : defaultQuestions;
+      try {
+        const { data, error } = await supabaseClient.from('questions').select('*');
+        questions = (data && data.length > 0 && !error) ? data : defaultQuestions;
+      } catch(err) {
+        console.warn("Supabase Abfrage fehlgeschlagen, nutze Fallback:", err);
+        questions = defaultQuestions;
+      }
     } else {
       questions = defaultQuestions;
     }
@@ -273,7 +288,7 @@
   function openCustomBuilder() {
     showScreen('screen-custom-builder');
     const container = document.getElementById('customQuestionsList');
-    let pool = (questions.length > 0) ? questions : defaultQuestions;
+    let pool = (questions && questions.length > 0) ? questions : defaultQuestions;
     
     let html = '';
     pool.forEach(q => {
@@ -304,7 +319,7 @@
   }
 
   function saveAndStartCustomQuiz() {
-    let pool = (questions.length > 0) ? questions : defaultQuestions;
+    let pool = (questions && questions.length > 0) ? questions : defaultQuestions;
     let selected = [];
     
     pool.forEach(q => {
@@ -361,13 +376,18 @@
     document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
 
     if (supabaseClient) {
-      let updatePayload = {};
-      updatePayload[userRole + '_answers'] = userAnswers;
-      updatePayload['settings'] = { show_talking_points: showTalkingPoints };
+      try {
+        let updatePayload = {};
+        updatePayload[userRole + '_answers'] = userAnswers;
+        updatePayload['settings'] = { show_talking_points: showTalkingPoints };
 
-      await supabaseClient.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
-      const { data: roomData } = await supabaseClient.from('rooms').select('*').eq('room_code', currentRoomCode).single();
-      evaluateResults(roomData);
+        await supabaseClient.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
+        const { data: roomData } = await supabaseClient.from('rooms').select('*').eq('room_code', currentRoomCode).single();
+        evaluateResults(roomData);
+      } catch(err) {
+        console.warn("Ergebnis-Sync fehlgeschlagen:", err);
+        evaluateResults({ p1_answers: userAnswers, p2_answers: [] });
+      }
     } else {
       evaluateResults({ p1_answers: userAnswers, p2_answers: [] });
     }
@@ -417,6 +437,10 @@
   }
 
   function renderPieChart(p1, p2) {
+    if (typeof Chart === 'undefined') {
+      console.warn("Chart.js nicht verfügbar.");
+      return;
+    }
     const ctx = document.getElementById('kinkChart').getContext('2d');
     const categories = ['sensual', 'bondage', 'dominance', 'impact', 'roleplay'];
     const scores = [0, 0, 0, 0, 0];
@@ -448,14 +472,43 @@
     userRole = 'p2';
 
     if (supabaseClient) {
-      const { data } = await supabaseClient.from('questions').select('*');
-      questions = (data && data.length > 0) ? data : defaultQuestions;
+      try {
+        const { data } = await supabaseClient.from('questions').select('*');
+        questions = (data && data.length > 0) ? data : defaultQuestions;
+      } catch(e) {
+        questions = defaultQuestions;
+      }
     } else {
       questions = defaultQuestions;
     }
     
     showScreen('screen-config');
   }
+
+  // GLOBAL BINDINGS & EVENT LISTENERS
+  window.showScreen = showScreen;
+  window.startStandardQuiz = startStandardQuiz;
+  window.openCustomBuilder = openCustomBuilder;
+  window.addCustomPair = addCustomPair;
+  window.saveAndStartCustomQuiz = saveAndStartCustomQuiz;
+  window.initQuiz = initQuiz;
+  window.handleAnswer = handleAnswer;
+  window.undoLastAnswer = undoLastAnswer;
+  window.joinRoom = joinRoom;
+  window.shareRoomLink = shareRoomLink;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btn-nav-home').addEventListener('click', () => showScreen('screen-menu'));
+    document.getElementById('btn-start-standard').addEventListener('click', startStandardQuiz);
+    document.getElementById('btn-custom-builder').addEventListener('click', openCustomBuilder);
+    document.getElementById('btn-join-room').addEventListener('click', joinRoom);
+    document.getElementById('btn-init-quiz').addEventListener('click', initQuiz);
+    document.getElementById('btn-config-back').addEventListener('click', () => showScreen('screen-menu'));
+    document.getElementById('btn-add-custom').addEventListener('click', addCustomPair);
+    document.getElementById('btn-save-custom').addEventListener('click', saveAndStartCustomQuiz);
+    document.getElementById('btn-undo').addEventListener('click', undoLastAnswer);
+    document.getElementById('btn-results-home').addEventListener('click', () => showScreen('screen-menu'));
+  });
 </script>
 </body>
 </html>
