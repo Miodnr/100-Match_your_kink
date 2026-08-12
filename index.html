@@ -3,460 +3,410 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>100 - Match your Kinks</title>
+  <title>Match your Kinks - Full Edition</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
-
+    * { box-sizing: border-box; user-select: none; }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0; padding: 0;
+      font-family: 'Nunito', sans-serif;
       background-color: #171210;
       color: #f3ebd9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh;
-      overflow: hidden;
     }
 
-    .app-header {
-      position: absolute;
-      top: 20px;
-      font-size: 1.4rem;
-      font-weight: 900;
-      color: #ea580c;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    .header-title {
+      font-size: 1.4rem; font-weight: 900; color: #ea580c;
+      letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; margin-bottom: 15px;
     }
 
-    .container {
-      width: 88%;
-      max-width: 390px;
-      height: 490px;
-      position: relative;
-      margin-top: 40px;
+    .screen { display: none; width: 90%; max-width: 420px; text-align: center; }
+    .screen.active { display: block; }
+
+    .card-box {
+      background: #241c18; padding: 25px; border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 20px;
     }
 
-    .card {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      color: #ffffff;
-      border-radius: 32px;
-      padding: 32px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      font-size: 1.45rem;
-      font-weight: 800;
-      line-height: 1.4;
-      touch-action: none;
-      transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.35s ease;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    /* BUTTONS & INPUTS */
+    button {
+      background: #ea580c; color: white; border: none; padding: 14px 24px;
+      font-size: 1rem; font-family: 'Nunito', sans-serif; border-radius: 25px;
+      cursor: pointer; font-weight: 800; width: 100%; margin: 8px 0;
+      box-shadow: 0 6px 16px rgba(234, 88, 12, 0.3); transition: transform 0.15s ease;
+    }
+    button:active { transform: scale(0.97); }
+    button.sec { background: #332822; color: #f3ebd9; box-shadow: none; border: 1px solid rgba(255,255,255,0.1); }
+    button.undo { background: #475569; width: auto; padding: 8px 18px; font-size: 0.9rem; }
+
+    input[type="text"] {
+      width: 100%; padding: 14px; border-radius: 16px; border: 1px solid #44352c;
+      background: #1a1412; color: #fff; font-size: 1rem; text-align: center; margin-bottom: 12px;
+    }
+
+    /* QUIZ SWIPE CARD */
+    .quiz-container { height: 420px; position: relative; margin-top: 10px; }
+    .swipe-card {
+      position: absolute; width: 100%; height: 100%; border-radius: 28px;
+      padding: 28px; display: flex; flex-direction: column; justify-content: center;
+      align-items: center; color: white; font-size: 1.35rem; font-weight: 800;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6); touch-action: none;
+      transition: transform 0.1s ease, opacity 0.1s ease;
     }
 
     .badge {
-      position: absolute;
-      top: 24px;
-      padding: 8px 18px;
-      font-weight: 900;
-      border-radius: 14px;
-      font-size: 1.05rem;
-      opacity: 0;
-      pointer-events: none;
-      letter-spacing: 0.5px;
-      background: #ffffff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      position: absolute; top: 20px; padding: 6px 14px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 900; opacity: 0;
     }
-    .badge-yes { right: 24px; color: #15803d; transform: rotate(10deg); }
-    .badge-no { left: 24px; color: #b91c1c; transform: rotate(-10deg); }
-    .badge-super { top: 65px; color: #0284c7; }
+    .badge-no { left: 20px; background: #b91c1c; color: #fff; }
+    .badge-maybe { top: 60px; background: #d97706; color: #fff; }
+    .badge-yes { right: 20px; background: #15803d; color: #fff; }
+    .badge-super { top: 20px; background: #0284c7; color: #fff; }
 
-    .progress-bar {
-      position: absolute;
-      top: 15px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: rgba(255, 255, 255, 0.65);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+    .controls-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+    .btn-action { padding: 12px 5px; font-size: 0.85rem; border-radius: 16px; margin: 0; }
+    .btn-no { background: #991b1b; }
+    .btn-maybe { background: #d97706; }
+    .btn-yes { background: #15803d; }
+    .btn-super { background: #0284c7; }
 
-    .controls-hint {
-      margin-top: 20px;
-      font-size: 0.85rem;
-      color: #bfae9c;
-      font-weight: 600;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.06);
-      padding: 10px 20px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    /* RESULTS */
+    .match-card {
+      background: #2e241f; padding: 14px; border-radius: 16px; text-align: left;
+      margin-bottom: 10px; border-left: 5px solid #22c55e;
     }
+    .match-card.super { border-left-color: #38bdf8; }
+    .match-card.talking { border-left-color: #f59e0b; }
+    .match-title { font-weight: 900; font-size: 1.05rem; }
+    .match-desc { font-size: 0.88rem; color: #bfae9c; margin-top: 4px; }
 
-    .results {
-      display: none;
-      background: #241c18;
-      color: #f3ebd9;
-      padding: 25px;
-      border-radius: 32px;
-      width: 90%;
-      max-width: 420px;
-      text-align: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      max-height: 85vh;
-      overflow-y: auto;
-      margin-top: 20px;
-    }
-
-    .results h2 {
-      margin-top: 0;
-      color: #ffffff;
-      font-size: 1.8rem;
-    }
-
-    button {
-      background: #ea580c;
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      font-size: 1.05rem;
-      font-family: 'Nunito', sans-serif;
-      border-radius: 30px;
-      cursor: pointer;
-      margin-top: 15px;
-      font-weight: 800;
-      box-shadow: 0 8px 18px rgba(234, 88, 12, 0.35);
-      transition: transform 0.15s ease;
-    }
-
-    button:active {
-      transform: scale(0.96);
-    }
-
-    .match-item {
-      background: #332822;
-      margin: 12px 0;
-      padding: 16px;
-      border-radius: 18px;
-      text-align: left;
-      font-size: 1rem;
-    }
-    .match-super { border-left: 6px solid #38bdf8; }
-    .match-yes { border-left: 6px solid #22c55e; }
-
-    .match-detail {
-      font-size: 0.88rem;
-      color: #bfae9c;
-      margin-top: 6px;
-      line-height: 1.35;
-    }
+    .toggle-wrapper { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; text-align: left; }
+    .toggle-wrapper input { width: 20px; height: 20px; accent-color: #ea580c; }
   </style>
 </head>
 <body>
 
-<div class="app-header">100 - Match your Kinks</div>
+<div class="header-title">100 - Match your Kinks</div>
 
-<div class="container" id="quizContainer">
-  <div class="card" id="activeCard">
-    <div class="progress-bar" id="progressText">Frage 1 / 100</div>
-    <div class="badge badge-yes">JA</div>
-    <div class="badge badge-no">NEIN</div>
-    <div class="badge badge-super">SUPER JA</div>
-    <div id="questionText">Lade Fragen...</div>
+<!-- SCREEN 1: HAUPTMENÜ -->
+<div id="screen-menu" class="screen active">
+  <div class="card-box">
+    <h2>Willkommen 🔥</h2>
+    <p style="color: #bfae9c; font-size: 0.95rem;">Entdeckt eure gemeinsamen Fantasien, Vorlieben und Grenzen.</p>
+    
+    <button onclick="startStandardQuiz()">🚀 Standard-Quiz starten</button>
+    <button class="sec" onclick="showScreen('screen-custom-builder')">🛠️ Eigenes Quiz zusammenstellen</button>
+
+    <div style="margin-top: 20px; border-top: 1px solid #3d2f28; padding-top: 15px;">
+      <p style="font-size: 0.9rem; font-weight: 800;">Raum beitreten oder fortsetzen:</p>
+      <input type="text" id="roomInput" placeholder="4-stelliger Code (z.B. KINK)" maxlength="8">
+      <button class="sec" onclick="joinRoom()">Raum öffnen 🔑</button>
+    </div>
   </div>
 </div>
 
-<div class="controls-hint" id="hint">
-  ⬅️ Links = Nein | ➡️ Rechts = Ja | ⬆️ Oben = Super Ja
+<!-- SCREEN 2: EINSTELLUNGEN & KATEGORIEN -->
+<div id="screen-config" class="screen">
+  <div class="card-box">
+    <h3>Einstellungen</h3>
+    <div class="toggle-wrapper">
+      <label for="talkingPointsToggle"><strong>Unterschiede anzeigen</strong><br><small style="color:#bfae9c">Als Gesprächsstoff nach dem Quiz</small></label>
+      <input type="checkbox" id="talkingPointsToggle" checked>
+    </div>
+    <button onclick="initQuiz()">Quiz jetzt starten 🎯</button>
+    <button class="sec" onclick="showScreen('screen-menu')">Zurück</button>
+  </div>
 </div>
 
-<div class="results" id="results">
-  <h2>Fertig! 🔥</h2>
-  <div id="resultsContent"></div>
+<!-- SCREEN 3: CUSTOM QUIZ BUILDER -->
+<div id="screen-custom-builder" class="screen">
+  <div class="card-box" style="text-align: left; max-height: 80vh; overflow-y: auto;">
+    <h3 style="text-align: center;">Custom Quiz Baukasten</h3>
+    <p style="font-size: 0.85rem; color: #bfae9c;">Wähle Fragen aus oder füge eigene hinzu:</p>
+    
+    <div id="customQuestionsList">Lade Fragen-Pool...</div>
+    
+    <hr style="border-color: #3d2f28; margin: 15px 0;">
+    <h4>Eigene Frage hinzufügen:</h4>
+    <input type="text" id="customActive" placeholder="Aktiv (z.B. Partner filmen)">
+    <input type="text" id="customPassive" placeholder="Passiv (z.B. Gefilmt werden)">
+    <button class="sec" onclick="addCustomPair()">+ Frage hinzufügen</button>
+    
+    <button onclick="saveAndStartCustomQuiz()" style="margin-top: 15px;">Custom Quiz starten 🚀</button>
+  </div>
+</div>
+
+<!-- SCREEN 4: QUIZ INTERFACE -->
+<div id="screen-quiz" class="screen">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span id="progressText" style="font-weight: 800; font-size: 0.9rem;">Frage 1 / 100</span>
+    <button class="undo" onclick="undoLastAnswer()">↩️ Undo</button>
+  </div>
+
+  <div class="quiz-container" id="quizContainer">
+    <div class="swipe-card" id="activeCard">
+      <div class="badge badge-no">NEIN</div>
+      <div class="badge badge-maybe">VIELLEICHT</div>
+      <div class="badge badge-yes">JA</div>
+      <div class="badge badge-super">SUPER JA</div>
+      <div id="cardQuestionText">Frage lädt...</div>
+    </div>
+  </div>
+
+  <div class="controls-grid">
+    <button class="btn-action btn-no" onclick="handleAnswer(0)">Nein</button>
+    <button class="btn-action btn-maybe" onclick="handleAnswer(1)">Vielleicht</button>
+    <button class="btn-action btn-yes" onclick="handleAnswer(2)">Ja</button>
+    <button class="btn-action btn-super" onclick="handleAnswer(3)">Super Ja</button>
+  </div>
+</div>
+
+<!-- SCREEN 5: ERGEBNISSE -->
+<div id="screen-results" class="screen">
+  <div class="card-box" style="max-height: 85vh; overflow-y: auto;">
+    <h2>Ergebnisse 🔥</h2>
+    <div id="roomCodeDisplay" style="font-weight: 800; color: #ea580c; margin-bottom: 10px;"></div>
+    
+    <button id="shareBtn" onclick="shareRoomLink()">Einladungs-Link teilen 💌</button>
+    <p id="shareCounterText" style="font-size: 0.8rem; color: #bfae9c;">Teile den Link mit 3 Personen, um das Kink-Profil (Pie Chart) freizuschalten! [<span id="refCount">0</span>/3]</p>
+
+    <div id="matchesOutput"></div>
+
+    <!-- KINK PROFIL (PIE CHART) -->
+    <div style="margin-top: 25px; border-top: 1px solid #3d2f28; padding-top: 15px;">
+      <h3>Euer Kink-Profil</h3>
+      <div id="chartContainer" style="position: relative; width: 100%; height: 250px;">
+        <canvas id="kinkChart"></canvas>
+        <div id="chartOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(23,18,16,0.92); display: flex; justify-content: center; align-items: center; flex-direction: column; border-radius: 16px;">
+          <p style="font-size: 0.9rem; padding: 10px;">🔒 Noch gesperrt. Teile deinen Link 3x, um die Visuelle Auswertung freizuschalten!</p>
+        </div>
+      </div>
+    </div>
+
+    <button class="sec" onclick="showScreen('screen-menu')" style="margin-top: 20px;">Hauptmenü</button>
+  </div>
 </div>
 
 <script>
   // =========================================================
-  // EXAKT 50 AKTIV/PASSIV-PAARE = 100 DIFFERENZIERTE EINZELFRAGEN
+  // SUPABASE CONFIGURATION
   // =========================================================
-  const questionPairs = [
-    // --- SINNLICHKEIT & TEMPERATUR (5 Paare = 10 Fragen) ---
-    { active: "Eine ausgiebige Ganzkörpermassage mit Öl geben", passive: "Eine ausgiebige Ganzkörpermassage mit Öl bekommen" },
-    { active: "Dem Gegenüber die Augen verbinden", passive: "Die Augen vom Gegenüber verbunden bekommen" },
-    { active: "Sinnliche Eiswürfel-Spiele am Körper des Partners ausführen", passive: "Eiswürfel-Spiele am eigenen Körper empfangen" },
-    { active: "Heißwachs (Temperaturspiele) auf die Haut des Partners tröpfeln", passive: "Heißwachs (Temperaturspiele) auf der eigenen Haut spüren" },
-    { active: "Reizwäsche/Dessous speziell nach dem Wunsch des Partners tragen", passive: "Wunsch-Reizwäsche/Dessous am Partner sehen" },
+  const SUPABASE_URL = 'https://ejmqcerdposyrcyxjefu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbXFjZXJkcG9zeXJjeXhqZWZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NDQyODMsImV4cCI6MjEwMjEyMDI4M30.viPcp_bdceYEmhFSHNF04OoKhK2CYAvUxo6ehm01J-Y';
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // --- RESTRIKTION & FESSELN (5 Paare = 10 Fragen) ---
-    { active: "Handschellen oder Stofffesseln am Partner anlegen", passive: "Handschellen oder Stofffesseln angelegt bekommen" },
-    { active: "Komplexe Seilfesselung (Shibari / Bondage) am Partner knüpfen", passive: "Komplex mit Seilen gefesselt werden (Shibari)" },
-    { active: "Das Gegenüber an Möbeln oder am Bett fixieren", passive: "Vom Gegenüber an Möbeln oder am Bett fixiert werden" },
-    { active: "Die Arme des Partners hinter dem Rücken fixieren", passive: "Die eigenen Arme hinter dem Rücken fixiert bekommen" },
-    { active: "Gegenüber vollkommene Bewegungslosigkeit befehlen (Stillhalten müssen)", passive: "Absolut stillhalten müssen und mich nicht rühren dürfen" },
-
-    // --- BDSM: HALSBAND, LEINE & KNEBEL (4 Paare = 8 Fragen) ---
-    { active: "Dem Partner ein Halsband anlegen und ihn an der Leine führen", passive: "Ein Halsband tragen und vom Partner an der Leine geführt werden" },
-    { active: "Einen Knebel (Ballgag/Ringgag) beim Partner einsetzen", passive: "Einen Knebel (Ballgag/Ringgag) eingesetzt bekommen" },
-    { active: "Sensory Deprivation: Augenbinde und Gehörschutz beim Partner nutzen", passive: "Augenbinde und Gehörschutz gleichzeitig angelegt bekommen" },
-    { active: "Einen Keuschheitsgürtel / Keuschheits-Cage des Partners verwalten", passive: "Einen Keuschheitsgürtel / Keuschheits-Cage tragen" },
-
-    // --- IMPAКТ, SCHMERZ & PHYSISCHER REIZ (6 Paare = 12 Fragen) ---
-    { active: "Spanking mit der flachen Hand auf den Po verteilen", passive: "Spanking mit der flachen Hand auf den Po bekommen" },
-    { active: "Impact-Toys (Peitsche, Gerte, Paddel oder Rohrstock) anwenden", passive: "Impact-Toys (Peitsche, Gerte, Paddel oder Rohrstock) zu spüren bekommen" },
-    { active: "Nippelklemmen beim Partner anlegen und den Schmerz steuern", passive: "Nippelklemmen angelegt bekommen und den Schmerz spüren" },
-    { active: "Dem Partner sanft/kontrolliert ins Ohr, die Lippen oder den Hals beißen", passive: "Vom Partner sanft in Ohr, Lippen oder Hals gebissen werden" },
-    { active: "Dem Partner die Haare ziehen, um den Kopf zu steuern", passive: "An den Haaren gezogen werden, um den Kopf führen zu lassen" },
-    { active: "Leichte Ohrfeigen (Slapping) im Gesicht verteilen", passive: "Leichte Ohrfeigen (Slapping) im Gesicht bekommen" },
-
-    // --- DOMINANZ, MACHTSPIELE & ERZIEHUNG (6 Paare = 12 Fragen) ---
-    { active: "Die komplette Führung und Befehlskontrolle übernehmen", passive: "Mich komplett unterwerfen und allen Befehlen gehorchen" },
-    { active: "Vom Partner eine kniende oder demütige Haltung einfordern", passive: "Auf Befehl eine kniende oder demütige Haltung einnehmen" },
-    { active: "Erziehungs- oder Bestrafungsszenarien durchführen", passive: "Vom Partner erzogen oder bestraft werden" },
-    { active: "Aufgaben oder Regeln erteilen, die der Partner abarbeiten muss", passive: "Regeln und Aufgaben vom Partner erhalten und abarbeiten müssen" },
-    { active: "Verbal demütigen und schmutzige Erniedrigungen aussprechen", passive: "Verbal gedemütigt und erniedrigt werden" },
-    { active: "Den Partner wie ein menschliches Objekt oder Spielzeug benutzen", passive: "Wie ein menschliches Objekt oder Spielzeug benutzt werden" },
-
-    // --- ORGASMUS-STEUERUNG & FLUIDS (4 Paare = 8 Fragen) ---
-    { active: "Orgasm Denial: Den Orgasmus des Partners steuern und verweigern", passive: "Orgasm Denial: Den eigenen Orgasmus verweigert/gesteuert bekommen" },
-    { active: "Dem Partner befehlen, auf Kommando zu kommen", passive: "Nur auf direktes Kommando des Partners kommen dürfen" },
-    { active: "Gezielt auf/in den Körper oder das Gesicht des Partners ejakulieren", passive: "Die Ejakulation des Partners auf/in meinem Körper oder Gesicht empfangen" },
-    { active: "Edging: Den Partner wiederholt kurz vor den Orgasmus bringen und stoppen", passive: "Edging: Wiederholt kurz vor den Orgasmus gebracht und gestoppt werden" },
-
-    // --- TOYS & TECHNIK (4 Paare = 8 Fragen) ---
-    { active: "Erotisches Spielzeug (Vibratoren, Aufleger) am Partner anwenden", passive: "Erotisches Spielzeug am eigenen Körper angewendet bekommen" },
-    { active: "Ein Spielzeug des Partners per App oder Fernbedienung steuern", passive: "Ein Spielzeug tragen, das der Partner per App/Fernbedienung steuert" },
-    { active: "Anal-Plugs oder Dildos beim Partner einführen", passive: "Anal-Plugs oder Dildos am eigenen Körper eingeführt bekommen" },
-    { active: "Gegenseitigen Sex vor einem großen Spiegel aktiv führen", passive: "Vor einem großen Spiegel vom Partner positioniert und verwöhnt werden" },
-
-    // --- ORAL & ANAL SPEZIFISCH (6 Paare = 12 Fragen) ---
-    { active: "Ausgiebigen Oralverkehr geben (Fellatio oder Cunnilingus)", passive: "Ausgiebigen Oralverkehr empfangen (Fellatio oder Cunnilingus)" },
-    { active: "Deepthroat: Tiefen Oralverkehr aktiv führen/durchführen", passive: "Deepthroat: Tiefen Oralverkehr empfangen / den Mund hingeben" },
-    { active: "Analingus / Rimming beim Partner ausführen", passive: "Analingus / Rimming am eigenen Körper genießen" },
-    { active: "Facesitting: Mich aktiv auf das Gesicht des Partners setzen", passive: "Facesitting: Mein Gesicht als Sitzfläche für den Partner anbieten" },
-    { active: "Den Partner mit einem Strap-On (Umschnalldildo) anal penetrieren", passive: "Mit einem Strap-On (Umschnalldildo) anal penetriert werden" },
-    { active: "Den Partner anal mit dem Penis penetrieren", passive: "Vom Penis des Partners anal penetriert werden" },
-
-    // --- ROLLENSPIELE, JAGD & TABU-SZENARIEN (7 Paare = 14 Fragen) ---
-    { active: "Das Gegenüber aktiv 'jagen' und fangen", passive: "Vor dem Gegenüber fliehen/verstecken und gejagt werden" },
-    { active: "CNC / Konsensuelles Überfalls-Spiel (Rapeplay) aktiv ausführen", passive: "CNC / Konsensuelles Überfalls-Spiel (Rapeplay) passiv geschehen lassen" },
-    { active: "Doktorspiele: Medizinische Untersuchung am Partner durchführen", passive: "Doktorspiele: Untersuchung am eigenen Körper durchführen lassen" },
-    { active: "Rollenspiel Chef/Angestellte(r) aktiv steuern", passive: "Rollenspiel Chef/Angestellte(r) als Untergebene(r) mitspielen" },
-    { active: "Rollenspiel Lehrer/Schüler(in) oder Erzieher(in) aktiv führen", passive: "Rollenspiel Lehrer/Schüler(in) in der maßgeregelten Rolle spielen" },
-    { active: "Den Partner als 'Fremde(n)' in einer Bar/Hotel ansprechen und verführen", passive: "Als 'Fremde(r)' in einer Bar/Hotel angesprochen und verführt werden" },
-    { active: "Schlafsex (Somnophilie): Den schlafenden Partner sanft verführen/wecken", passive: "Schlafsex (Somnophilie): Im Schlaf sanft verführt/geweckt werden" },
-
-    // --- KOMMUNIKATION & VISUALS (3 Paare = 6 Fragen) ---
-    { active: "Aktiv schmutzigen Dirty Talk sprechen und Anweisungen geben", passive: "Schmutzigen Dirty Talk und Anweisungen vom Partner hören" },
-    { active: "Den Partner auffordern, einen Striptease vorzugrenzen", passive: "Einen Striptease für den Partner vorführen" },
-    { active: "Erotische Fotos/Videos vom Partner mit dessen Einverständnis machen", passive: "Mich vom Partner für erotische Fotos/Videos in Szene setzen lassen" }
-  ];
-
-  // =========================================================
-  // AUTOMATISCHER AUFBAU ALLER 100 FRAGEN
-  // =========================================================
+  // APP STATE
+  let currentRoomCode = null;
+  let userRole = 'p1'; // 'p1' oder 'p2'
   let questions = [];
-  questionPairs.forEach((item, pIdx) => {
-    questions.push({ text: item.active, pairIdx: pIdx, role: 'active', otherText: item.passive });
-    questions.push({ text: item.passive, pairIdx: pIdx, role: 'passive', otherText: item.active });
-  });
+  let userAnswers = [];
+  let currentIndex = 0;
+  let showTalkingPoints = true;
+  let referralCount = 0;
 
-  const cardColors = [
-    "#c2410c", "#854d0e", "#9f1239", "#b45309", 
-    "#831843", "#9a3412", "#701a75", "#a16207"
+  // SAMPLE QUESTIONS FALLBACK
+  const defaultQuestions = [
+    { id: 1, pair_title: 'Ölmassage', text_active: 'Eine ausgiebige Ganzkörpermassage mit Öl geben', text_passive: 'Eine ausgiebige Ganzkörpermassage mit Öl bekommen', tag: 'sensual' },
+    { id: 2, pair_title: 'Augenbinde', text_active: 'Dem Gegenüber die Augen verbinden', text_passive: 'Die Augen vom Gegenüber verbunden bekommen', tag: 'sensual' },
+    { id: 3, pair_title: 'Handschellen', text_active: 'Handschellen oder Stofffesseln am Partner anlegen', text_passive: 'Handschellen oder Stofffesseln angelegt bekommen', tag: 'bondage' },
+    { id: 4, pair_title: 'Führung', text_active: 'Die komplette Führung und Befehlskontrolle übernehmen', text_passive: 'Mich komplett unterwerfen und allen Befehlen gehorchen', tag: 'dominance' },
+    { id: 5, pair_title: 'Spanking', text_active: 'Spanking mit der flachen Hand auf den Po verteilen', text_passive: 'Spanking mit der flachen Hand auf den Po bekommen', tag: 'impact' }
   ];
 
-  let currentAnswers = [];
-  let currentIndex = 0;
-  let partnerAnswers = null;
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const p1Data = urlParams.get('p1');
-  if (p1Data) {
-    try {
-      partnerAnswers = JSON.parse(atob(decodeURIComponent(p1Data)));
-    } catch (e) {
-      console.error("Ungültige Daten im Share-Link");
-    }
+  // SCREEN SWITCHER
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
   }
 
-  const card = document.getElementById('activeCard');
-  const questionText = document.getElementById('questionText');
-  const progressText = document.getElementById('progressText');
-  const badgeYes = card.querySelector('.badge-yes');
-  const badgeNo = card.querySelector('.badge-no');
-  const badgeSuper = card.querySelector('.badge-super');
+  // START STANDARD QUIZ
+  async function startStandardQuiz() {
+    currentRoomCode = 'KINK-' + Math.floor(1000 + Math.random() * 9000);
+    userRole = 'p1';
+    
+    // Fragen aus Supabase laden oder Fallback
+    const { data } = await supabase.from('questions').select('*');
+    questions = (data && data.length > 0) ? data : defaultQuestions;
+    
+    showScreen('screen-config');
+  }
 
-  let startX = 0, startY = 0;
-  let currentX = 0, currentY = 0;
-  let isDragging = false;
+  // INIT QUIZ
+  function initQuiz() {
+    showTalkingPoints = document.getElementById('talkingPointsToggle').checked;
+    userAnswers = [];
+    currentIndex = 0;
+    showScreen('screen-quiz');
+    renderCard();
+  }
 
-  function showQuestion() {
+  // RENDER CARD
+  function renderCard() {
     if (currentIndex < questions.length) {
-      questionText.innerText = questions[currentIndex].text;
-      progressText.innerText = `Frage ${currentIndex + 1} / ${questions.length}`;
-      const colorIndex = currentIndex % cardColors.length;
-      card.style.backgroundColor = cardColors[colorIndex];
-      resetCardPosition();
+      const q = questions[currentIndex];
+      // Alternierende Anzeige: Gerade Indizes = Aktiv, Ungerade = Passiv
+      const isPassiv = currentIndex % 2 !== 0;
+      const text = isPassiv ? q.text_passive : q.text_active;
+      const roleLabel = isPassiv ? " (Passiv)" : " (Aktiv)";
+
+      document.getElementById('cardQuestionText').innerText = text + roleLabel;
+      document.getElementById('progressText').innerText = `Frage ${currentIndex + 1} / ${questions.length}`;
     } else {
       finishQuiz();
     }
   }
 
-  function resetCardPosition() {
-    card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-    badgeYes.style.opacity = 0;
-    badgeNo.style.opacity = 0;
-    badgeSuper.style.opacity = 0;
-  }
-
-  function startDrag(x, y) {
-    isDragging = true;
-    startX = x;
-    startY = y;
-  }
-
-  function moveDrag(x, y) {
-    if (!isDragging) return;
-    currentX = x - startX;
-    currentY = y - startY;
-
-    let rotate = currentX * 0.04;
-    card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotate}deg)`;
-
-    if (currentY < -80 && Math.abs(currentX) < 100) {
-      badgeSuper.style.opacity = Math.min(Math.abs(currentY) / 120, 1);
-      badgeYes.style.opacity = 0;
-      badgeNo.style.opacity = 0;
-    } else if (currentX > 50) {
-      badgeYes.style.opacity = Math.min(currentX / 100, 1);
-      badgeNo.style.opacity = 0;
-      badgeSuper.style.opacity = 0;
-    } else if (currentX < -50) {
-      badgeNo.style.opacity = Math.min(Math.abs(currentX) / 100, 1);
-      badgeYes.style.opacity = 0;
-      badgeSuper.style.opacity = 0;
-    } else {
-      badgeYes.style.opacity = 0;
-      badgeNo.style.opacity = 0;
-      badgeSuper.style.opacity = 0;
-    }
-  }
-
-  function endDrag() {
-    if (!isDragging) return;
-    isDragging = false;
-
-    const threshold = 100;
-    if (currentY < -threshold && Math.abs(currentX) < 120) {
-      answer(2);
-    } else if (currentX > threshold) {
-      answer(1);
-    } else if (currentX < -threshold) {
-      answer(0);
-    } else {
-      resetCardPosition();
-    }
-  }
-
-  function answer(val) {
-    currentAnswers.push(val);
+  // HANDLE ANSWER
+  function handleAnswer(val) {
+    userAnswers.push(val);
     currentIndex++;
-    showQuestion();
+    renderCard();
   }
 
-  card.addEventListener('touchstart', e => startDrag(e.touches[0].clientX, e.touches[0].clientY));
-  card.addEventListener('touchmove', e => moveDrag(e.touches[0].clientX, e.touches[0].clientY));
-  card.addEventListener('touchend', endDrag);
-
-  card.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-  document.addEventListener('mouseup', endDrag);
-
-  function finishQuiz() {
-    document.getElementById('quizContainer').style.display = 'none';
-    document.getElementById('hint').style.display = 'none';
-    const resultsDiv = document.getElementById('results');
-    const content = document.getElementById('resultsContent');
-    resultsDiv.style.display = 'block';
-
-    if (!partnerAnswers) {
-      const encoded = encodeURIComponent(btoa(JSON.stringify(currentAnswers)));
-      const shareUrl = `${window.location.origin}${window.location.pathname}?p1=${encoded}`;
-
-      content.innerHTML = `
-        <p style="font-size: 1.2rem; font-weight: 800;">Du hast alle 100 Fragen beantwortet!</p>
-        <p style="font-size: 0.95rem; color: #bfae9c;">Sende diesen Link an deinen Partner / deine Partnerin, um eure Ergebnisse abzugleichen:</p>
-        <button onclick="navigator.clipboard.writeText('${shareUrl}'); alert('Link in die Zwischenablage kopiert!');">
-          Link kopieren 📋
-        </button>
-      `;
-    } else {
-      let matchesHtml = "<h3 style='color: #ffffff; font-size: 1.3rem;'>Eure Übereinstimmungen:</h3>";
-      let matchCount = 0;
-
-      let flatIndex = 0;
-      questionPairs.forEach((pair) => {
-        const actIdx = flatIndex;
-        const passIdx = flatIndex + 1;
-        flatIndex += 2;
-
-        const p1Act = partnerAnswers[actIdx] || 0;
-        const p1Pass = partnerAnswers[passIdx] || 0;
-        const p2Act = currentAnswers[actIdx] || 0;
-        const p2Pass = currentAnswers[passIdx] || 0;
-
-        const dir1 = (p1Act > 0 && p2Pass > 0);
-        const dir2 = (p1Pass > 0 && p2Act > 0);
-
-        if (dir1 || dir2) {
-          matchCount++;
-          const isSuper = (p1Act === 2 || p1Pass === 2 || p2Act === 2 || p2Pass === 2);
-          const cssClass = isSuper ? "match-super" : "match-yes";
-          let detailText = "";
-
-          if (dir1 && dir2) {
-            detailText = `🔄 <strong>Wechsel-Match!</strong> Beide sind offen für beide Rollen (Aktiv & Passiv). Partner(in) möchte: <em>${pair.active}</em><br>Du möchtest: <em>${pair.passive}</em>`;
-          } else if (dir1) {
-            detailText = `Partner(in) möchte: <em>${pair.active}</em><br>Du möchtest: <em>${pair.passive}</em>`;
-          } else if (dir2) {
-            detailText = `Du möchtest: <em>${pair.active}</em><br>Partner(in) möchte: <em>${pair.passive}</em>`;
-          }
-
-          matchesHtml += `
-            <div class="match-item ${cssClass}">
-              <strong>${isSuper ? "🌟 Super Match!" : "✅ Match!"}</strong>
-              <div class="match-detail">${detailText}</div>
-            </div>
-          `;
-        }
-      });
-
-      if (matchCount === 0) {
-        matchesHtml += "<p style='color: #bfae9c;'>Keine direkten Übereinstimmungen gefunden.</p>";
-      }
-
-      content.innerHTML = matchesHtml;
+  // UNDO LAST ANSWER
+  function undoLastAnswer() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      userAnswers.pop();
+      renderCard();
     }
   }
 
-  showQuestion();
+  // FINISH QUIZ & SYNC
+  async function finishQuiz() {
+    showScreen('screen-results');
+    document.getElementById('roomCodeDisplay').innerText = `Raum-Code: ${currentRoomCode}`;
+
+    // Raum in Supabase speichern
+    let updatePayload = {};
+    updatePayload[userRole + '_answers'] = userAnswers;
+    updatePayload['settings'] = { show_talking_points: showTalkingPoints };
+
+    await supabase.from('rooms').upsert({ room_code: currentRoomCode, ...updatePayload });
+
+    // Daten für Auswertung abrufen
+    const { data: roomData } = await supabase.from('rooms').select('*').eq('room_code', currentRoomCode).single();
+    
+    evaluateResults(roomData);
+    checkReferrals();
+  }
+
+  // EVALUATE MATCHES & TALKING POINTS
+  function evaluateResults(room) {
+    const p1 = room ? room.p1_answers : userAnswers;
+    const p2 = room ? room.p2_answers : [];
+    const container = document.getElementById('matchesOutput');
+    
+    if (!p2 || p2.length === 0) {
+      container.innerHTML = `<p style="color: #bfae9c;">Du hast deinen Teil ausgefüllt! Sende den Code <strong>${currentRoomCode}</strong> an deinen Partner.</p>`;
+      return;
+    }
+
+    let html = "<h3>Eure Auswertung</h3>";
+    
+    questions.forEach((q, idx) => {
+      const a1 = p1[idx] || 0;
+      const a2 = p2[idx] || 0;
+
+      // Volles Match
+      if (a1 >= 2 && a2 >= 2) {
+        const isSuper = a1 === 3 || a2 === 3;
+        html += `
+          <div class="match-card ${isSuper ? 'super' : ''}">
+            <div class="match-title">${isSuper ? '🌟 Super Match' : '✅ Match'}: ${q.pair_title}</div>
+            <div class="match-desc">Beide haben Interesse an dieser Aktion!</div>
+          </div>`;
+      } 
+      // Talking Points (bei Option)
+      else if (showTalkingPoints && ((a1 >= 2 && a2 === 1) || (a1 === 1 && a2 >= 2))) {
+        html += `
+          <div class="match-card talking">
+            <div class="match-title">⚡ Gesprächsstoff: ${q.pair_title}</div>
+            <div class="match-desc">Einer sagt Ja, einer sagt Vielleicht – perfektes Thema zum Erkunden!</div>
+          </div>`;
+      }
+    });
+
+    container.innerHTML = html;
+    renderPieChart(p1, p2);
+  }
+
+  // SHARE LINK & REFERRAL SYSTEM
+  function shareRoomLink() {
+    const url = `${window.location.origin}${window.location.pathname}?ref=${currentRoomCode}`;
+    if (navigator.share) {
+      navigator.share({ title: 'Match your Kinks', text: 'Mach mit beim Kink-Match!', url: url });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert('Einladungslink in die Zwischenablage kopiert!');
+    }
+  }
+
+  // REFERRAL TRACKER
+  async function checkReferrals() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+
+    if (ref) {
+      await supabase.from('referrals').insert([{ ref_code: ref, visitor_hash: Math.random().toString() }]);
+    }
+
+    const { count } = await supabase.from('referrals').select('*', { count: 'exact', head: true }).eq('ref_code', currentRoomCode);
+    referralCount = count || 0;
+    document.getElementById('refCount').innerText = referralCount;
+
+    if (referralCount >= 3) {
+      document.getElementById('chartOverlay').style.display = 'none';
+    }
+  }
+
+  // PIE CHART RENDERER
+  function renderPieChart(p1, p2) {
+    const ctx = document.getElementById('kinkChart').getContext('2d');
+    const categories = ['sensual', 'bondage', 'dominance', 'impact', 'roleplay'];
+    const scores = [0, 0, 0, 0, 0];
+
+    questions.forEach((q, idx) => {
+      const catIdx = categories.indexOf(q.tag);
+      if (catIdx !== -1) {
+        scores[catIdx] += (p1[idx] || 0) + (p2[idx] || 0);
+      }
+    });
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Sinnlichkeit', 'Fesseln', 'Dominanz', 'Impact', 'Rollenspiele'],
+        datasets: [{
+          data: scores,
+          backgroundColor: ['#ea580c', '#d97706', '#0284c7', '#991b1b', '#701a75']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
+    });
+  }
+
+  // JOIN ROOM VIA INPUT
+  async function joinRoom() {
+    const code = document.getElementById('roomInput').value.trim();
+    if (!code) return alert('Bitte Code eingeben!');
+    currentRoomCode = code;
+    userRole = 'p2';
+
+    const { data } = await supabase.from('questions').select('*');
+    questions = (data && data.length > 0) ? data : defaultQuestions;
+    
+    showScreen('screen-config');
+  }
 </script>
 </body>
 </html>
-
